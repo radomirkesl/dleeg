@@ -20,7 +20,6 @@
 % zda jde o mužské, nebo ženské jméno.
 \author{Radomír Kesl}
 \declarationmale
-
 %alternativa: 
 %\declarationfemale
 
@@ -91,11 +90,102 @@
 
 \chapter{Introduction}
 
-\cite{barrese:invasive:fail:13}
+	Complex recordings of human brain electrical activity could help us uncover various secrets of the human brain and its disorders, as well as make progress towards brain-controlled computers.
+	Recording brain activity has recently been becoming increasingly common, especially the very needed large-scale experiments have started to emerge. Processing these however tends to be a complex task which usually requires a lot of time-costly manual work and prior knowledge of human staff and might be subjected to human bias. Using artificial intelligence for these purposes thus seems like a natural approach, and since the patterns of the brain tend to be complicated, the very advanced neural networks might be a great technique for tackling this problem.
+	This paper first discusses the background of this area from various perspectives then focuses on the state-of-the-art before presenting ideas for consecutive research. Finally, a subset of these ideas is chosen and implemented.
+	The purpose of this research is to help advance extraction of information from recordings of human brain electrical activity in order to make them more useful  for future medical research or for direct use in brain-computer interfaces.
+	This paper focuses on the application of neural networks on data from recordings of electrical activity of the human brain for processing and extracting key information.
+
+\chapter{Background}
+
+In this chapter various concepts, important for the area are explained in the following order. First the prevalent ways of recording brain activity are discussed, secondly examples of tasks which use neural networks and these recordings are presented, after that the basic types of modern neural networks are shown and finally data availability is briefly considered.
+
+	\section{Recording brain activity}
+
+	\subsection{Electroencephalography}
+
+	Electroencephalography (EEG) is probably the most used method of recording brain activity. It is conducted by planting electrodes on the scalp and making a record of the changing voltage (Berger~\cite{berger:eeg:29}, as cited by Luck~\cite{luck:erp:book}). This approach tends to be relatively convenient, as it can be easily recorded with a cap equipped with electrodes which is an asset usually not difficult to obtain nowadays.
+	It does have disadvantages though, for example it generally has low spatial resolution and is prone to artefacts~\cite{berezutskaya:ieeg:22}. EEG does usually obtain signals from several neural sources which overlap and that in turn complicates isolating the desired information~\cite{luck:erp:book}. This is one of the problems which appears to call for a solution through neural networks.
+
+	% Invasive techniques of recording the activity of the brain, while effective, have a significant disadvantage that the necessary implants tend to fail over time~\cite{barrese:invasive:fail:13}.
+	% TODO: iEEG, fMRI, MEG
+
+	\section{Classification tasks}
+
+	\subsection{Brain-computer interface and motor imagery}
+
+	Using manual controls like buttons, joysticks or other physical movement is a serviceable but not very natural way of controlling assisting systems for the disabled~\cite{he:bci:legs:18}. This is only one of the areas, where brain-computer interface could be significantly beneficial~\cite{craik:dl:eeg:rev:19}.
+	As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{stieger:data:21}. 
+	This is another obstacle, which might be best overcome by neural networks.
+
+	Motor imagery tasks seem to be among the most practical in BCI applications. During these tasks, the subject imagines a specific movement of their body~\cite{craik:dl:eeg:rev:19} and the BCI attempts to discern this motion, so that the connected machine could react accordingly.
+	One of its advantages is that it simulates natural ways in which humans control their movement.	For example, imagining walking could be used to control a wheelchair, or a prosthetic leg (assistant devices). Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help rehabilitate their ability to control the said limb.
+	Another significant advantage is that motor imagery has a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01} which can help verify the accuracy of the measurement, among other neurophysiological benefits~[\emph{ibid.}].
+
+	% TODO: emotion recognition, mental workload, seizure detection, sleep stage scoring, ERP
+
+	\section{Neural network types}
+
+	% TODO: CNN, DBN, RNN
+
+	\section{Data availability}
+
+	The lack of large, extensive datasets tends to be a problem while attempting to use neural networks on brain activity recordings. This is because complex classifiers, such as neural networks, while extremely precise with large amounts of data, tend to overfit easily in the case of insufficient data~\cite{domingos:ml:12}. This shortage seems to be mostly caused by the complexity of required experiments and the lack of appropriate subjects~\cite{he:da:21}. However, some studies that emerged recently appear reasonably extensive even for the use with these techniques.
+
+	Data augmentation (DA) --- a method of dealing with overfitting via generating additional data based on existing data --- tends to be a valuable tool in NN processing of brain activity recordings, because of the lack of complex datasets described earlier~\cite{he:da:21}. It carries some potential risks, such as reduced performance, but it usually succeeds in increasing accuracy of neural networks~[\emph{ibid.}].
+
+	% TODO: maybe examples of DA?
 
 \chapter{State-of-the-art}
 
+	In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First a couple new open datasets of promising extensiveness are discussed and then examples of modern deep learning systems are shown.
+ 
+	\section{Datasets}
+
+	\subsection{Med-62 dataset}
+
+	The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by Stieger et al.~\cite{stieger:data:21} appears to be among the best in class with more than 250000 trials from 62 subjects, collected over 7--11 sessions.
+	The task in these experiments was moving a cursor via imagining hand movement. The subject was supposed to imagine opening and closing their left or right hand to move the cursor in the respective direction, opening and closing both hands at once to move the cursor up and clearing their mind to move the cursor down. Third of the trials was limited to up-down movement, third to left-right movement and the rest in both dimensions.
+	The 2D movement is a relatively uniquely complex task.
+	Another important point is that one of the purposes of the study was to examine the evolving proficiency as the subject underwent successive sessions which could serve for potential DL analysis.
+	Some subjects also received training in mindfulness and meditation, as examination of the effects of this training on BCI proficiency were among the main interests of the study~\cite{stieger:mindfulness:20}.
+
+	This, together with other metadata which is provided in great measure for the dataset, could be used to conduct various experiments in order to improve accuracy of the BCI using neural networks.
+	In this study a BCI was already used to allow the users to control the cursor and thus be able to include the subjects' response to the visual feedback in the data. Nevertheless, a more classical approach to discern the subjects' intention was implemented, one based on actual neurophysiological knowledge of the expected EEG signal. Therefore, it seems natural to attempt to use a DL based method and compare the outcomes.
+
+	Recently, an extensive study has been conducted on the presented dataset by Zhu et al.~\cite{zhu:dl:bci:mi:22}, comparing state-of-the-art DL systems. All of them have outperformed the classical BCI used originally.\@ However, only a limited part was used by the authors in order to allow comparability to another dataset. Only one of three tasks was used --- moving the cursor from left to right, but up-down movement and 2D movement were omitted, as well as all sessions after the third.
+	That might mean that even better accuracy could be achieved, if more of the data was used.
+	This appears to be the only extensive study, conducted on the data of interest so far, which leaves a decent amount of space for further studies while providing a possibility of comparison.
+
+	% TODO: Other datasets
+
+	\section{Algorithms}
+
+	% TODO: for example EEGNet, Deep & Shallow ConvNet, Multi-Branch 3D CNN, Parallel Self-Attention Network
+
 \chapter{Analysis}
+
+Ideas for future research in the application of neural networks on brain activity data are proposed in this chapter. Some of these will be selected for the final application. Firs new approaches on using specific data for training NNs in BCIs are suggested, then a more effective approach to storing data for experiments is discussed.
+
+	\section{Learning on data from trained users}
+
+	According to Stieger et al.~\cite{stieger:data:21,stieger:mindfulness:20} users can improve in BCI proficiency via training. The question is: Could learning on recordings from these advanced users produce better classifiers than simply using all the available data? And would these be effective for any user or only those of comparable abilities?
+	
+	This issue appears to be worth investigating via experimentation and the Med-62 dataset~\cite{stieger:data:21} could be very useful for that. Learning neural networks on this whole dataset and comparing the results to the same classifiers, learned on the later sessions only, could be  attempted. Also adding data augmentation to both of the experiments might produce interesting results --- the dataset is large enough, so that such a tool does not seem necessary, but it could still improve the accuracy, especially if only a part of the dataset is used.
+
+	Additionally, similar experiments could be performed with focus on users who received training in meditation instead of or in addition to using the later sessions.
+
+	\section{Metadata specific training}
+	
+	Another approach that could be attempted is trying to find a classifier which would best work for a specific group of subjects based on a shared quality, such as gender, age and task-specific subject traits (such as dominant hand in the case of motor imagery). This could be done by training an entire subject-specific classifier which in case of long term used systems, such as BCI-operated assistant devices, would probably still be worth the extra work, or by pre-training a general classifier and then adding specializations for each user.
+
+	This approach seems to require a large amount of data equipped with profound metadata and once again, the Med-62 dataset~\cite{stieger:data:21} appears appropriate for that. In addition, as using subsets of datasets reduces the volume of the data significantly, data augmentation would likely be a worthwhile tool for these methods.
+
+	\section{Unified and efficient approach to data}
+
+	Speaking from a completely different perspective, it does seem that this area of research could benefit from a more unified approach to some procedures, such as data recording and especially storage. A system where the data is in a single binary file could be designed. All the metadata could be in an external database or a similar system which would provide very fast access to any subset of the dataset, based on the metadata --- basically via simple queries.
+
+	A system like this could for example simplify the experiment procedure and increase the performance of metadata specific training discussed above. However, unification of the storage would probably be just useful in general, it could lead to better comparability between studies and much more complex and useful benchmarks.
 
 % 
 % PRO ANGLICKOU SAZBU JE NUTNÉ ZMĚNIT

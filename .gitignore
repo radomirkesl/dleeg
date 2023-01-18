@@ -277,3 +277,6 @@ TSWLatexianTemp*
 
 # Matlab data
 *.mat
+
+# Custom:
+.vscode
