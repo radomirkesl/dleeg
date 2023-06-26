@@ -12,18 +12,21 @@
 
 % Možné jazyky práce: czech, english
 % Možné typy práce: BP (bakalářská), DP (diplomová)
-\documentclass[english,BP]{thesiskiv}
+\documentclass[eng,BP]{thesiskiv}
 
 % Definujte údaje pro vstupní strany
 %
 % Jméno a příjmení; kvůli textu prohlášení určete, 
 % zda jde o mužské, nebo ženské jméno.
+% LTeX: enabled=false
 \author{Radomír Kesl}
+% LTeX: enabled=true
 \declarationmale
 %alternativa: 
 %\declarationfemale
 
 % Název práce
+% LTeX: language=en-GB
 \title{Neural networks for processing recordings of brain electrical activity}
 
 % 
@@ -89,7 +92,7 @@
 \maketitle
 \tableofcontents
 
-% LTeX: language=en-US
+% LTeX: language=en-GB
 
 \chapter{Introduction}
 
@@ -194,7 +197,7 @@ A system like this could for example simplify the experiment procedure and incre
 % PRO ANGLICKOU SAZBU JE NUTNÉ ZMĚNIT
 % CITAČNÍ STYL!
 %
-\bibliographystyle{ieeetr}
+\bibliographystyle{plainnat}
 {\raggedright\small
 	\bibliography{references}
 }

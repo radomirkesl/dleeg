@@ -6,13 +6,17 @@
 %
 % Petr Lobaz, lobaz@kiv.zcu.cz, 2016/03/14
 %
+% Disable LTeX grammar check
+% LTeX: enabled=false
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{thesiskiv}[2016/03/14 Thesis at DCSE (KIV)]
-\DeclareOption{czech}{\def\KIV@lng{czech}}
-\DeclareOption{english}{\def\KIV@lng{british}}
+% Change language option names so that they don't interfere with babel
+\DeclareOption{cze}{\def\KIV@lng{czech}}
+\DeclareOption{eng}{\def\KIV@lng{british}}
 \DeclareOption{BP}{}
 \DeclareOption{DP}{}
-\ExecuteOptions{czech}
+\ExecuteOptions{cze}
 \ProcessOptions\relax
 %
 % DEFAULT PAGE LAYOUT, etc.
@@ -27,7 +31,8 @@
  \expandafter{%
  \expandafter\selectlanguage%
  \expandafter{\KIV@lng}}
-\RequirePackage[utf8]{inputenc}
+% Should not be necessary anymore
+% \RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
 \RequirePackage[a4paper,left=37mm,right=37mm,top=33mm,bottom=40mm]{geometry}
 \linespread{1.1}
@@ -145,7 +150,7 @@
 %
 % LANGUAGE DEPENDENT DEFAULT SETTINGS
 %
-\@ifclasswith{thesiskiv}{czech}{
+\@ifclasswith{thesiskiv}{cze}{
  \university{Západočeská univerzita v Plzni}
  \faculty{Fakulta aplikovaných věd}
  \department{Katedra informatiky a výpočetní techniky}
@@ -159,7 +164,7 @@
  \def\KIV@declarationtext{Prohlašuji, že jsem \KIV@thesistype\ práci vypracoval\ifdeclarationfemale{a}\fi\ samostatně a výhradně s~použitím citovaných pramenů.}
  \def\KIV@declarationfoot{V \KIV@declarationtown\ dne\ }
 }{}
-\@ifclasswith{thesiskiv}{english}{
+\@ifclasswith{thesiskiv}{eng}{
  \university{University of West Bohemia}
  \faculty{Faculty of Applied Sciences}
  \department{Department of Computer Science and Engineering}
