@@ -102,6 +102,8 @@ This paper first discusses the background of this area from various perspectives
 The purpose of this research is to help advance extraction of information from recordings of human brain electrical activity in order to make them more useful  for future medical research or for direct use in brain-computer interfaces.
 This paper focuses on the application of neural networks on data from recordings of electrical activity of the human brain for processing and extracting key information.
 
+% TODO: When done, adjust this to contain the specific form of the work
+
 \chapter{Background}
 
 In this chapter various concepts, important for the area are explained in the following order. First the prevalent ways of recording brain activity are discussed, secondly examples of tasks which use neural networks and these recordings are presented, after that the basic types of modern neural networks are shown and finally data availability is briefly considered.
@@ -124,9 +126,15 @@ Using manual controls like buttons, joysticks or other physical movement is a se
 As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{stieger:data:21}.
 This is another obstacle, which might be best overcome by neural networks.
 
-Motor imagery tasks seem to be among the most practical in BCI applications. During these tasks, the subject imagines a specific movement of their body~\cite{craik:dl:eeg:rev:19} and the BCI attempts to discern this motion, so that the connected machine could react accordingly.
-One of its advantages is that it simulates natural ways in which humans control their movement.	For example, imagining walking could be used to control a wheelchair, or a prosthetic leg (assistant devices). Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help rehabilitate their ability to control the said limb.
-Another significant advantage is that motor imagery has a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01} which can help verify the accuracy of the measurement, among other neurophysiological benefits~[\emph{ibid.}].
+Motor imagery tasks seem to be among the most practical in BCI applications. 
+They rely on the subject imagining a movement of a part of their body without actually performing it~\cite{craik:dl:eeg:rev:19}.
+The BCI then attempts to discern the imagined motion and passes the information to a connected system (assistant device, computer, \dots).
+
+One of the main advantages of this approach is that motor imagery (imagining a movement) tends to have a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01} which can help verify the accuracy of the measurement, among other neurophysiological benefits~[\emph{ibid.}].
+That essentially means that we can record brain activity of subjects performing the movement and later compare it to the recordings from subjects imagining the movement to achieve better certainty that the data is valuable. If the data from motor imagery is nowhere near the data from performing movement, we can assume it is flawed (distracted subject, failed recording device, \dots) and exclude it from the final dataset.
+It also means that we have a better idea of what to look for in the patterns of brain activity and that we could potentially feed this information to neural networks --- learn them on data from performing movements instead of (or as well as) imagining them.
+
+Another advantage is that motor imagery simulates natural ways in which humans control their movement.	For example, imagining walking could be used to control assistant devices, like a wheelchair (which is a lot more natural than a using a joystick or buttons), or a prosthetic leg. Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help recover their ability to control the said limb (rehabilitative devices). Alternatively, imagining hand movement could be used to move the mouse cursor on a PC, which might be useful for anyone, but especially those suffering from any arm or hand related disabilities.
 
 % TODO: emotion recognition, mental workload, seizure detection, sleep stage scoring, ERP
 
@@ -144,9 +152,13 @@ Data augmentation (DA) --- a method of dealing with overfitting via generating a
 
 \chapter{State-of-the-art}
 
+% TODO: add important experiments in motor imagery
+
 In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First a couple new open datasets of promising extensiveness are discussed and then examples of modern deep learning systems are shown.
 
 \section{Datasets}
+
+% TODO: mention the amount an availability of datasets, add a table comparing them on some important metrics and explain how the best were chosen based on those metrics
 
 \subsection{Med-62 dataset}
 
