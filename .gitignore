@@ -283,3 +283,5 @@ TSWLatexianTemp*
 *.tmp
 
 .vscode
+
+*.zip
