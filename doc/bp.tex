@@ -1,18 +1,18 @@
 % LTeX: enabled=false
-\documentclass[english, he, bc, kiv, iso690alph, pdf]{fasthesis}
+\documentclass[english, he, bc, kiv, iso690alph]{fasthesis}
 \usepackage{csquotes} % gets an annoying warning off of my face
-\author{Radomír}{Kesl}
+\author{Radomír}{Kesl}{}{}
 \supervisor{Doc. Ing. Roman Mouček, Ph.D.}
 \title{Neural networks for processing recordings of brain electrical activity}
 % TODO:
 \assignment{zadani.pdf}
 \signdate{31}{12}{2022}{V Nové Vsi u Nového Města na Moravě}
+\addbibresource{references.bib}
 \abstract{Text abstraktu v jazyce práce , tj. zde česky.}
 {The abstract text in a secondary language, here in English.}
 \keywords{šablona kvalifikační práce ,sazba ,DTP ,\LaTeX}
 \acknowledgement{Text poděkování.}
 % ENDTODO:
-\addbibresource{references.bib}
 \begin{document}
 
 \frontpages[tm]
@@ -50,7 +50,7 @@ It does have disadvantages though, for example it generally has low spatial reso
 \subsection{Brain-computer interface and motor imagery}
 
 Using manual controls like buttons, joysticks or other physical movement is a serviceable but not very natural way of controlling assisting systems for the disabled~\cite{he:bci:legs:18}. This is only one of the areas, where brain-computer interface could be significantly beneficial~\cite{craik:dl:eeg:rev:19}.
-As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{stieger:data:21}.
+As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{data:stieger:21}.
 This is another obstacle, which might be best overcome by neural networks.
 
 Motor imagery tasks seem to be among the most practical in BCI applications. 
@@ -81,15 +81,54 @@ Data augmentation (DA) --- a method of dealing with overfitting via generating a
 
 % TODO: add important experiments in motor imagery
 
-In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First a couple new open datasets of promising extensiveness are discussed and then examples of modern deep learning systems are shown.
+In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First new open datasets of promising extensiveness are discussed and then examples of modern deep learning systems are shown.
 
 \section{Datasets}
 
-% TODO: mention the amount and availability of datasets, add a table comparing them on some important metrics and explain how the best were chosen based on those metrics
+% TODO: add description of the comparison table, explain sufficien vs insufficient vs extensive metadata
 
-\subsection{Med-62 dataset}
+In this section, recent datasets are discussed in order to pick a good option for further experimenting. Each dataset has been assigned an alias (for convenience), as per table \ref{tab:aliases}. The best sets in their size (amount of participants, amount of trials and total recording time) have been recorded in table \ref{tab:datasets} and compared on other metrics, such as metadata quality and availability. Further in this section the chosen dataset is explained in detail. Note that this section is by no means meant to be a full review of the state-of-the-art datasets. It is a limited comparison with a goal of selecting a good set for our use. That means reasonably extensive, validated, equipped with metadata, accessible, and optimally already researched to an extent (other studies exist and can be used for comparison, but there is still space for further research).
 
-The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by Stieger et al.~\cite{stieger:data:21} appears to be among the best in class with more than 250000 trials from 62 subjects, collected over 7--11 sessions.
+\begin{table}
+\centering
+\begin{tabular}{@{}p{0.15\textwidth}p{0.6\textwidth}p{0.15\textwidth}@{}}
+\toprule
+\textbf{Alias} & \textbf{Article name} & \textbf{Citation} \\
+\midrule
+Dreyer-87 & A large EEG database with users’ profile information for motor imagery brain-computer interface research & \cite{data:dreyer:23} \\
+Ma-25 & A large EEG dataset for studying cross-session variability in motor imagery brain-computer interface & \cite{data:ma:22} \\
+Peterson-10 & A motor imagery vs. rest dataset with low-cost consumer grade EEG hardware & \cite{data:peterson:22} \\
+ Stieger-62 & Continuous sensorimotor rhythm based brain computer interface learning
+ in a large population & \cite{data:stieger:21} \\
+\bottomrule
+\end{tabular}
+\caption{Aliases of compared datasets.}
+\label{tab:aliases}
+\end{table}
+
+\begin{table}
+\centering
+\resizebox{\textwidth}{!}{
+    \begin{tabular}{@{}*{9}{l}@{}}
+\toprule
+\textbf{Dataset} & \textbf{Participants} & \textbf{Trials} & \textbf{Recording time} & \textbf{Citations} & \textbf{Metadata} & \textbf{Validation} & \textbf{Availability} & \textbf{Licence} \\
+\midrule
+Dreyer-87 & 87 & 20800 & 70 hours & 0 & Extensive & Present & Open Access & CC BY 4.0 \\
+Ma-25 & 25 & 12500 & 26 hours & 6 & Insufficient & Present & Open Access & CC BY 4.0 \\
+Peterson-10 & 10 & 1650 & 15 hours & 1 & Insufficient & Missing & Open Access & CC0 \\
+Stieger-62 & 62 & 250000 & 600 hours & 15 & Extensive & Present & Open Access & CC BY 4.0 \\
+\bottomrule
+\end{tabular}
+}
+\caption{Comparison of recent datasets. Note that trials and recording time are usually an approximation made by us or directly the authors of the dataset. The 'Citations' column contains the amount of times the data paper was cited on Web of Science at the time of writing this.}
+\label{tab:datasets}
+\end{table}
+
+% TODO: Review and edit
+
+\subsection{Stieger-62 dataset}
+
+The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by Stieger et al.~\cite{data:stieger:21} appears to be among the best in class with more than 250000 trials from 62 subjects, collected over 7--11 sessions.
 The task in these experiments was moving a cursor via imagining hand movement. The subject was supposed to imagine opening and closing their left or right hand to move the cursor in the respective direction, opening and closing both hands at once to move the cursor up and clearing their mind to move the cursor down. Third of the trials was limited to up-down movement, third to left-right movement and the rest in both dimensions.
 The 2D movement is a relatively uniquely complex task.
 Another important point is that one of the purposes of the study was to examine the evolving proficiency as the subject underwent successive sessions which could serve for potential DL analysis.
@@ -102,8 +141,6 @@ Recently, an extensive study has been conducted on the presented dataset by Zhu 
 That might mean that even better accuracy could be achieved, if more of the data was used.
 This appears to be the only extensive study, conducted on the data of interest so far, which leaves a decent amount of space for further studies while providing a possibility of comparison.
 
-% TODO: Other datasets
-
 \section{Algorithms}
 
 % TODO: for example EEGNet, Deep & Shallow ConvNet, Multi-Branch 3D CNN, Parallel Self-Attention Network
@@ -114,9 +151,9 @@ Ideas for future research in the application of neural networks on brain activit
 
 \section{Learning on data from trained users}
 
-According to Stieger et al.~\cite{stieger:data:21,stieger:mindfulness:20} users can improve in BCI proficiency via training. The question is: Could learning on recordings from these advanced users produce better classifiers than simply using all the available data? And would these be effective for any user or only those of comparable abilities?
+According to Stieger et al.~\cite{data:stieger:21,stieger:mindfulness:20} users can improve in BCI proficiency via training. The question is: Could learning on recordings from these advanced users produce better classifiers than simply using all the available data? And would these be effective for any user or only those of comparable abilities?
 
-This issue appears to be worth investigating via experimentation and the Med-62 dataset~\cite{stieger:data:21} could be very useful for that. Learning neural networks on this whole dataset and comparing the results to the same classifiers, learned on the later sessions only, could be  attempted. Also adding data augmentation to both of the experiments might produce interesting results --- the dataset is large enough, so that such a tool does not seem necessary, but it could still improve the accuracy, especially if only a part of the dataset is used.
+This issue appears to be worth investigating via experimentation and the Med-62 dataset~\cite{data:stieger:21} could be very useful for that. Learning neural networks on this whole dataset and comparing the results to the same classifiers, learned on the later sessions only, could be  attempted. Also adding data augmentation to both of the experiments might produce interesting results --- the dataset is large enough, so that such a tool does not seem necessary, but it could still improve the accuracy, especially if only a part of the dataset is used.
 
 Additionally, similar experiments could be performed with focus on users who received training in meditation instead of or in addition to using the later sessions.
 
@@ -124,7 +161,7 @@ Additionally, similar experiments could be performed with focus on users who rec
 
 Another approach that could be attempted is trying to find a classifier which would best work for a specific group of subjects based on a shared quality, such as gender, age and task-specific subject traits (such as dominant hand in the case of motor imagery). This could be done by training an entire subject-specific classifier which in case of long term used systems, such as BCI-operated assistant devices, would probably still be worth the extra work, or by pre-training a general classifier and then adding specializations for each user.
 
-This approach seems to require a large amount of data equipped with profound metadata and once again, the Med-62 dataset~\cite{stieger:data:21} appears appropriate for that. In addition, as using subsets of datasets reduces the volume of the data significantly, data augmentation would likely be a worthwhile tool for these methods.
+This approach seems to require a large amount of data equipped with profound metadata and once again, the Med-62 dataset~\cite{data:stieger:21} appears appropriate for that. In addition, as using subsets of datasets reduces the volume of the data significantly, data augmentation would likely be a worthwhile tool for these methods.
 
 \section{Unified and efficient approach to data}
 
