@@ -85,9 +85,10 @@ In the following chapter, some state-of-the-art research is presented and evalua
 
 \section{Datasets}
 
-% TODO: add description of the comparison table, explain sufficien vs insufficient vs extensive metadata
+In this section, recent datasets are discussed in order to pick a good option for further experimenting. Each dataset has been assigned an alias (for convenience), as per table \ref{tab:aliases}. The examined sets have been recorded in table \ref{tab:datasets} and compared on metrics, such as size (amount of participants, trials and total recording time), metadata quality and availability. Further in this section a dataset is chosen and explained in detail. Note that this section is by no means meant to be a full review of the state-of-the-art datasets. It is a limited comparison with a goal of selecting a good set for our use. That means reasonably extensive, validated, equipped with metadata, accessible, and optimally already researched to an extent (other studies exist and can be used for comparison, but there is still space for further research).
 
-In this section, recent datasets are discussed in order to pick a good option for further experimenting. Each dataset has been assigned an alias (for convenience), as per table \ref{tab:aliases}. The best sets in their size (amount of participants, amount of trials and total recording time) have been recorded in table \ref{tab:datasets} and compared on other metrics, such as metadata quality and availability. Further in this section the chosen dataset is explained in detail. Note that this section is by no means meant to be a full review of the state-of-the-art datasets. It is a limited comparison with a goal of selecting a good set for our use. That means reasonably extensive, validated, equipped with metadata, accessible, and optimally already researched to an extent (other studies exist and can be used for comparison, but there is still space for further research).
+The most of the comparison can be seen in table \ref{tab:datasets}. Note that trials and recording time are usually an approximation made by us or directly the authors of the dataset. The 'Citations' column contains the amount of times the data paper was cited on Web of Science at the time of writing this. The 'Metadata' column shows the quality of the metadata, attached to the dataset, where 'Sufficient' means at least gender, age and laterality; 'Insufficient' means anything less than that; and 'Extensive' means substantially more than that.
+Based on our findings, the Stieger-62 dataset was chosen. The main reason is its size, which beats all the listed competition (and likely most of the unlisted as well) and while the Dreyer-87 dataset has a greater number of participants, the amount of trials and recording time in Stieger-62 is far superior, and we consider it more important. This dataset also fulfils all other requirements (validation, accessibility, \dots) and has a reasonable amount of citations. For those reasons it will be examined more closely and likely chosen for our experiments. If new issues appear about it, the Dreyer-87 dataset will be considered.
 
 \begin{table}
 \centering
@@ -115,12 +116,12 @@ Peterson-10 & A motor imagery vs. rest dataset with low-cost consumer grade EEG 
 \midrule
 Dreyer-87 & 87 & 20800 & 70 hours & 0 & Extensive & Present & Open Access & CC BY 4.0 \\
 Ma-25 & 25 & 12500 & 26 hours & 6 & Insufficient & Present & Open Access & CC BY 4.0 \\
-Peterson-10 & 10 & 1650 & 15 hours & 1 & Insufficient & Missing & Open Access & CC0 \\
+Peterson-10 & 10 & 1650 & 15 hours & 1 & Sufficient & Missing & Open Access & CC0 \\
 Stieger-62 & 62 & 250000 & 600 hours & 15 & Extensive & Present & Open Access & CC BY 4.0 \\
 \bottomrule
 \end{tabular}
 }
-\caption{Comparison of recent datasets. Note that trials and recording time are usually an approximation made by us or directly the authors of the dataset. The 'Citations' column contains the amount of times the data paper was cited on Web of Science at the time of writing this.}
+\caption{Comparison of recent datasets.}
 \label{tab:datasets}
 \end{table}
 
