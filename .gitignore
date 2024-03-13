@@ -279,9 +279,8 @@ TSWLatexianTemp*
 *.mat
 
 # Custom:
-
 *.tmp
-
 .vscode
-
 *.zip
+
+*__pycache__

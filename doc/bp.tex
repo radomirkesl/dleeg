@@ -79,8 +79,6 @@ Data augmentation (DA) --- a method of dealing with overfitting via generating a
 
 \chapter{State-of-the-art}
 
-% TODO: add important experiments in motor imagery
-
 In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First new open datasets of promising extensiveness are discussed and then examples of modern deep learning systems are shown.
 
 \section{Datasets}
@@ -131,20 +129,21 @@ Stieger-62 & 62 & 250000 & 600 hours & 15 & Extensive & Present & Open Access & 
 
 The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by Stieger et al.~\cite{data:stieger:21} appears to be among the best in class with more than 250000 trials from 62 subjects, collected over 7--11 sessions.
 The task in these experiments was moving a cursor via imagining hand movement. The subject was supposed to imagine opening and closing their left or right hand to move the cursor in the respective direction, opening and closing both hands at once to move the cursor up and clearing their mind to move the cursor down. Third of the trials was limited to up-down movement, third to left-right movement and the rest in both dimensions.
-The 2D movement is a relatively uniquely complex task.
-Another important point is that one of the purposes of the study was to examine the evolving proficiency as the subject underwent successive sessions which could serve for potential DL analysis.
-Some subjects also received training in mindfulness and meditation, as examination of the effects of this training on BCI proficiency were among the main interests of the study~\cite{stieger:mindfulness:20}.
+The 2D movement is a relatively uniquely complex task among BCI experiments.
+Another important point is that one of the purposes of the study was to examine the evolving proficiency as the subject underwent successive sessions which could serve potential DL analysis.
+Some subjects also received training in mindfulness and meditation, as examination of the effects of this training on BCI proficiency was among the main interests of the study~\cite{stieger:mindfulness:20}.
 
 This, together with other metadata which is provided in great measure for the dataset, could be used to conduct various experiments in order to improve accuracy of the BCI using neural networks.
-In this study a BCI was already used to allow the users to control the cursor and thus be able to include the subjects' response to the visual feedback in the data. Nevertheless, a more classical approach to discern the subjects' intention was implemented, one based on actual neurophysiological knowledge of the expected EEG signal. Therefore, it seems natural to attempt to use a DL based method and compare the outcomes.
+In this study a BCI was already used (online) to allow the users to control the cursor and thus be able to include the subjects' response to the visual feedback in the data. Nevertheless, a more classical approach to discern the subjects' intention was implemented, one based on actual neurophysiological knowledge of the expected EEG signal. Therefore, it seems natural to attempt to use a DL based method and compare the outcomes.
 
-Recently, an extensive study has been conducted on the presented dataset by Zhu et al.~\cite{zhu:dl:bci:mi:22}, comparing state-of-the-art DL systems. All of them have outperformed the classical BCI used originally.\@ However, only a limited part was used by the authors in order to allow comparability to another dataset. Only one of three tasks was used --- moving the cursor from left to right, but up-down movement and 2D movement were omitted, as well as all sessions after the third.
-That might mean that even better accuracy could be achieved, if more of the data was used.
-This appears to be the only extensive study, conducted on the data of interest so far, which leaves a decent amount of space for further studies while providing a possibility of comparison.
+Recently, an extensive study has been conducted on the presented dataset by Zhu et al.~\cite{zhu:dl:bci:mi:22}, comparing state-of-the-art DL systems, conducting a within-subject analysis, as well as a cross-subject analysis. Only a limited subset of the Stieger-62 dataset was used by the authors in order to allow comparability to another dataset. Specifically, only one of three tasks was used --- moving the cursor from left to right, up-down movement and 2D movement were omitted. Additionally, only the first three sessions were used.
+The following algorithms were used: EEGNet (CNN), Deep and Shallow ConvNet, Multi-Branch 3D CNN (CNN with 3D tensor input, arranged by spatial position on the scalp) and ParaAtt (Parallel Self-Attention Network). In the within-subject analysis, a model was built for each subject, using recordings from the first two sessions for training (20\% of that for validation) and data from the third session for testing. All the algorithms have outperformed the classical BCI used for online evaluation in the within-subject analysis. However, only EEGNet surpassed the online evaluation in a statistically significant way, achieving accuracy of $75.47 \pm 10.8\%$, while online achieved $68.10 \pm 12.6\%$.\@
+For the cross-subject analysis, a model was also built for each subject, only this time using the first three sessions from that one subject as the test set  and the first three sessions of the remaining subjects as the training set (again, 20\% for validation). According to the authors of the study, EEGNet performed the best again (better than all the other models in a statistically significant way), but they do not provide the specific numbers.
+This appears to be the only extensive study, conducted on the data of interest so far (and reasonably accessible to us), which leaves a decent amount of space for further studies while providing a possibility of comparison.
 
 \section{Algorithms}
 
-% TODO: for example EEGNet, Deep & Shallow ConvNet, Multi-Branch 3D CNN, Parallel Self-Attention Network
+% TODO: CNN + LSTM, ...
 
 \chapter{Analysis}
 
