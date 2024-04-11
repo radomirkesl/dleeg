@@ -9,7 +9,7 @@ def train_model_unvalidated(model: torch.nn.Module, train_data, train_labels, nu
         for idx, seq in enumerate(train_data): # hidden state needs to be reset after every sample
             model.reset_hidden_state()
             # train loss
-            seq = torch.unsqueeze(seq, 0)
+            # seq = torch.unsqueeze(seq, 0)
             y_pred = model(seq)
             loss = loss_fn(y_pred[0].float(), train_labels[idx]) # calculated loss after 1 step
             # update weights

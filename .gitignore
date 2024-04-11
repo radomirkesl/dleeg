@@ -284,3 +284,4 @@ TSWLatexianTemp*
 *.zip
 
 *__pycache__
+*lightning_logs
