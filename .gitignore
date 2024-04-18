@@ -285,3 +285,5 @@ TSWLatexianTemp*
 
 *__pycache__
 *lightning_logs
+mats
+*.ckpt
