@@ -287,3 +287,4 @@ TSWLatexianTemp*
 *lightning_logs
 mats
 *.ckpt
+*.ds

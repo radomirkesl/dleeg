@@ -1,17 +1,33 @@
-from scipy.io import loadmat
-from dataclasses import dataclass
-import numpy as np
-from enum import IntEnum
-from typing import Optional, Tuple, List
 import os
-from torch.utils.data import TensorDataset, DataLoader, random_split
+from dataclasses import dataclass
+from enum import IntEnum
+from typing import List, Optional, Tuple
 
+import numpy as np
 import torch
+from scipy.io import loadmat
+from torch.utils.data import DataLoader, TensorDataset, random_split
 
 CHANNEL_COUNT = 62
 MAX_DATA_LEN = 11041
 MAX_SHAPE = (CHANNEL_COUNT, MAX_DATA_LEN)
-DESIRED_CHANNELS = ['CZ', 'C3', 'C4']
+POSSIBLE_CHANNELS = [
+        'FP1', 'FPZ', 'FP2',
+        'AF3', 'AF4',
+        'F7', 'F5', 'F3', 'F1', 'FZ', 'F2', 'F4', 'F6', 'F8',
+        'FT7',
+        'FC5', 'FC3', 'FC1', 'FCZ', 'FC2', 'FC4', 'FC6', 'FT8',
+        'T7',
+        'C5', 'C3', 'C1', 'CZ', 'C2', 'C4', 'C6',
+        'T8',
+        'TP7',
+        'CP5', 'CP3', 'CP1', 'CPZ', 'CP2', 'CP4', 'CP6',
+        'TP8',
+        'P7', 'P5', 'P3', 'P1', 'PZ', 'P2', 'P4', 'P6', 'P8',
+        'PO7', 'PO5', 'PO3', 'POZ', 'PO4', 'PO6', 'PO8',
+        'CB1',
+        'O1', 'OZ', 'O2', 'CB2'
+        ]
 
 class Task(IntEnum):
     LEFT_RIGHT = 1
@@ -26,28 +42,22 @@ class Target(IntEnum):
 
 @dataclass
 class DataSet:
-    data: torch.Tensor
-    labels: torch.Tensor
+    data: np.ndarray
+    labels: np.ndarray
     online_accuracy: float
     forced_online_accuracy: float
 
-def make_loader(dataset: DataSet, workers = 0) -> DataLoader:
-    tds = TensorDataset(dataset.data, dataset.labels)
-    return DataLoader(tds, num_workers=workers)
+def make_dataset(dataset: DataSet) -> TensorDataset:
+    data = torch.tensor(dataset.data, dtype=torch.float32)
+    labels = torch.tensor(dataset.labels, dtype=torch.float32)
+    return TensorDataset(data, labels)
 
-def make_split_loaders(dataset: DataSet, lengths: Tuple[float, ...], workers = 0, batch_size=1) -> Tuple[DataLoader, ...]:
-    tds = TensorDataset(dataset.data, dataset.labels)
-    sets = random_split(tds, lengths)
-    return tuple(DataLoader(s, num_workers=workers, batch_size=batch_size) for s in sets)
-
-# @dataclass
-# class DataSet:
-#     data: np.ndarray
-#     labels: np.ndarray
-#     online_accuracy: float
-#     forced_online_accuracy: float
-
-def load(folder_path: str, filter_task: Optional[Task] = None, time_frame: Optional[Tuple[int, int]] = None, filter_channels: Optional[List[str]] = None) -> DataSet:
+def load(
+        folder_path: str,
+        filter_task: Optional[Task] = None,
+        time_frame: Optional[Tuple[int, int]] = None,
+        filter_channels: Optional[List[str]] = None
+        ) -> DataSet:
     shape = MAX_SHAPE
     if filter_channels:
         shape = (len(filter_channels), shape[1])
@@ -87,17 +97,16 @@ def load(folder_path: str, filter_task: Optional[Task] = None, time_frame: Optio
             label[trial_data['targetnumber'] - 1] = 1.0
             out_labels.append(label)
     return DataSet(
-            data = torch.tensor(np.array(out_data, dtype = np.float32), dtype = torch.float32).unsqueeze(dim = 1),
-            labels = torch.tensor(np.array(out_labels, dtype = np.float32), dtype = torch.float32),
+            data = np.array(out_data, dtype = np.float32),
+            labels = np.array(out_labels, dtype = np.float32),
             online_accuracy = success_count / len(out_data),
             forced_online_accuracy = forced_success_count / len(out_data)
             )
 
 
 if __name__ == "__main__":
-    ds = load('../data', time_frame = (2000, 6000))
-    print(ds.data.shape)
-    print(ds.data[0].shape)
-    print(ds.labels.shape)
-    print(ds.data[0])
+    used_channels = [chan for chan in POSSIBLE_CHANNELS if 'C' in chan]
+    ds = load('../data', time_frame = (2000, 6000), filter_channels=used_channels)
+    tds = make_dataset(ds)
+    torch.save(tds, 'sub01_ses05-11_chansC.ds')
 

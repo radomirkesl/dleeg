@@ -1,16 +1,17 @@
-from scipy.io import loadmat
-import torch
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-from pylab import rcParams
-import matplotlib.pyplot as plt
+import seaborn as sns
+import torch
 from matplotlib import rc
 from pandas.plotting import register_matplotlib_converters
-from torch import nn, optim
+from pylab import rcParams
+from scipy.io import loadmat
 from sklearn.preprocessing import MinMaxScaler
-import seaborn as sns
+from torch import nn, optim
+from tqdm import tqdm
 
 # %matplotlib inline
 # %config InlineBackend.figure_format='retina'
