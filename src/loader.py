@@ -1,3 +1,4 @@
+import gc
 import os
 from dataclasses import dataclass
 from enum import IntEnum
@@ -49,14 +50,15 @@ class DataSet:
 
 def make_dataset(dataset: DataSet) -> TensorDataset:
     data = torch.tensor(dataset.data, dtype=torch.float32)
-    labels = torch.tensor(dataset.labels, dtype=torch.float32)
+    labels = torch.tensor(dataset.labels, dtype=torch.uint8)
     return TensorDataset(data, labels)
 
 def load(
-        folder_path: str,
+        directory_path: str,
         filter_task: Optional[Task] = None,
         time_frame: Optional[Tuple[int, int]] = None,
-        filter_channels: Optional[List[str]] = None
+        filter_channels: List[str] = POSSIBLE_CHANNELS,
+        filter_noisy: bool = True,
         ) -> DataSet:
     shape = MAX_SHAPE
     if filter_channels:
@@ -67,21 +69,28 @@ def load(
     out_labels = []
     success_count = 0
     forced_success_count = 0
-    for file in os.listdir(folder_path):
+    class_balance = [0, 0, 0, 0]
+    noisy = set()
+    for file in os.listdir(directory_path):
         if not file.endswith('.mat'):
             continue
-        file_path = folder_path + '/' + file
+        file_path = directory_path + '/' + file
         print(f'Loading file {file_path}...')
         file_data = loadmat(file_path, simplify_cells = 'True')['BCI']
-        channel_indices = None
-        if filter_channels:
-            channel_indices = np.array([np.where(chan == file_data['chaninfo']['label']) for chan in filter_channels]).squeeze()
+        channel_indices = np.array([np.where(chan == file_data['chaninfo']['label']) for chan in filter_channels]).squeeze()
+        if filter_noisy:
+            noisechans = file_data['chaninfo']['noisechan']
+            if hasattr(noisechans, '__iter__'):
+                for idx in noisechans:
+                    noisy.add(file_data['chaninfo']['label'][idx - 1])
+            elif noisechans:
+                noisy.add(file_data['chaninfo']['label'][noisechans - 1])
+
         for data, trial_data in zip(file_data['data'], file_data['TrialData'], strict = True):
             task = Task(trial_data['tasknumber'])
             if filter_task is not None and task != filter_task:
                 continue
-            if channel_indices is not None:
-                data = data[channel_indices]
+            data = data[channel_indices]
             if time_frame is not None:
                 data = data[:, time_frame[0]:min(time_frame[1], data.shape[1])]
             if data.shape != shape:
@@ -93,20 +102,32 @@ def load(
             if trial_data['forcedresult']:
                 forced_success_count += 1
             out_data.append(data)
-            label = [0.0, 0.0, 0.0, 0.0]
-            label[trial_data['targetnumber'] - 1] = 1.0
+            label = trial_data['targetnumber'] - 1
+            class_balance[label] += 1
             out_labels.append(label)
+    gc.collect()
+    print(f'Class balance: {class_balance}')
+    print(out_data[0].shape)
+    if filter_noisy:
+        print(f'Noisy channels: {noisy}')
+        denoised_channels = [chan for chan in filter_channels if chan not in noisy]
+        denoised_indices = np.array([np.where(chan == np.array(filter_channels)) for chan in denoised_channels]).squeeze()
+        print(f'Denoised indices: {denoised_indices}')
+        out_data = [data[denoised_indices] for data in out_data]
+        print(out_data[0].shape)
     return DataSet(
             data = np.array(out_data, dtype = np.float32),
-            labels = np.array(out_labels, dtype = np.float32),
+            labels = np.array(out_labels, dtype = np.uint8),
             online_accuracy = success_count / len(out_data),
             forced_online_accuracy = forced_success_count / len(out_data)
             )
 
 
 if __name__ == "__main__":
+    from sys import argv
     used_channels = [chan for chan in POSSIBLE_CHANNELS if 'C' in chan]
-    ds = load('../data', time_frame = (2000, 6000), filter_channels=used_channels)
+    ds = load(argv[1], time_frame = (2000, 6000))
+    print(f'Online accuracy: {ds.online_accuracy}\tForced online accuracy: {ds.forced_online_accuracy}')
     tds = make_dataset(ds)
-    torch.save(tds, 'sub01_ses05-11_chansC.ds')
+    torch.save(tds, argv[2])
 

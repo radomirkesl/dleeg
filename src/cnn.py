@@ -1,12 +1,11 @@
 import pytorch_lightning as L
 import torch
-import torch.nn.functional as F
 from torch import nn
 from torch.optim import Adam
 from torchmetrics import Accuracy
 
 
-class CNN_LSTM(L.LightningModule):
+class CNN(L.LightningModule):
 
     def __init__(
         self,
@@ -20,7 +19,6 @@ class CNN_LSTM(L.LightningModule):
         feature_count=4,
         conv_depth = 2,
         dropout_rate = 0.5,
-        hidden_size = 128,
     ):
         super().__init__()
         conv1_out = conv_depth * conv1_filters
@@ -65,12 +63,8 @@ class CNN_LSTM(L.LightningModule):
             nn.Dropout(dropout_rate),
         )
         self.full = nn.Linear(
-            in_features=self.feature_count_after_convs(data_shape), out_features=hidden_size,
+            in_features=self.feature_count_after_convs(data_shape), out_features=feature_count,
         )
-        self.lstm = nn.LSTM(
-                input_size=hidden_size,
-                hidden_size=feature_count,
-                )
         self.loss = nn.CrossEntropyLoss()
         self.accuracy = Accuracy(task='multiclass', num_classes=4)
 
@@ -79,9 +73,8 @@ class CNN_LSTM(L.LightningModule):
         x = self.conv2(x)
 
         x = torch.flatten(x, 1)
-        x = self.full(x)
 
-        x, _ = self.lstm(x)
+        x = self.full(x)
 
         return x
 
@@ -141,12 +134,12 @@ if __name__ == "__main__":
     sets = random_split(tds, [0.64, 0.16, 0.2])
     train, val, test = tuple(DataLoader(s, num_workers=3, batch_size=32) for s in sets)
 
-    model = CNN_LSTM(
+    model = CNN(
         (1, *tds[0][0].shape),
         in_channels=len(used_channels)
     )
 
-    trainer = L.Trainer(max_epochs=100, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=10)])
+    trainer = L.Trainer(max_epochs=400, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=30)])
     trainer.fit(model, train_dataloaders=train, val_dataloaders=val)
     trainer.test(model, test)
     if len(argv) > 2:
