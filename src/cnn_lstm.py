@@ -21,6 +21,7 @@ class CNN_LSTM(L.LightningModule):
         conv_depth = 2,
         dropout_rate = 0.5,
         hidden_size = 128,
+        lstm_layers = 2,
     ):
         super().__init__()
         conv1_out = conv_depth * conv1_filters
@@ -64,13 +65,15 @@ class CNN_LSTM(L.LightningModule):
             nn.AvgPool1d(kernel_size=pool_kernel, stride=1),
             nn.Dropout(dropout_rate),
         )
-        self.full = nn.Linear(
-            in_features=self.feature_count_after_convs(data_shape), out_features=hidden_size,
-        )
         self.lstm = nn.LSTM(
-                input_size=hidden_size,
-                hidden_size=feature_count,
+                input_size=conv2_filters,
+                hidden_size=hidden_size,
+                batch_first=True,
+                num_layers=lstm_layers,
                 )
+        self.full = nn.Linear(
+            in_features=hidden_size, out_features=feature_count,
+        )
         self.loss = nn.CrossEntropyLoss()
         self.accuracy = Accuracy(task='multiclass', num_classes=4)
 
@@ -78,10 +81,11 @@ class CNN_LSTM(L.LightningModule):
         x = self.conv1(x)
         x = self.conv2(x)
 
-        x = torch.flatten(x, 1)
-        x = self.full(x)
+        # x = torch.flatten(x, 1)
 
+        x = x.permute(0, 2, 1)
         x, _ = self.lstm(x)
+        x = self.full(x[:, -1, :])
 
         return x
 
@@ -138,15 +142,17 @@ if __name__ == "__main__":
     # )
     # tds = make_dataset(ds)
     tds: TensorDataset = torch.load(argv[1])
+    data_shape = tds[0][0].shape
+    print(f'Data shape: {data_shape}')
     sets = random_split(tds, [0.64, 0.16, 0.2])
     train, val, test = tuple(DataLoader(s, num_workers=3, batch_size=32) for s in sets)
 
     model = CNN_LSTM(
-        (1, *tds[0][0].shape),
-        in_channels=len(used_channels)
+        (1, *data_shape),
+        in_channels=data_shape[0]
     )
 
-    trainer = L.Trainer(max_epochs=100, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=10)])
+    trainer = L.Trainer(max_epochs=200, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=20)])
     trainer.fit(model, train_dataloaders=train, val_dataloaders=val)
     trainer.test(model, test)
     if len(argv) > 2:

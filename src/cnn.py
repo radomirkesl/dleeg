@@ -131,15 +131,17 @@ if __name__ == "__main__":
     # )
     # tds = make_dataset(ds)
     tds: TensorDataset = torch.load(argv[1])
+    data_shape = tds[0][0].shape
+    print(f'Data shape: {data_shape}')
     sets = random_split(tds, [0.64, 0.16, 0.2])
     train, val, test = tuple(DataLoader(s, num_workers=3, batch_size=32) for s in sets)
 
     model = CNN(
-        (1, *tds[0][0].shape),
-        in_channels=len(used_channels)
+        (1, *data_shape),
+        in_channels=data_shape[0]
     )
 
-    trainer = L.Trainer(max_epochs=400, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=30)])
+    trainer = L.Trainer(max_epochs=10, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=3)])
     trainer.fit(model, train_dataloaders=train, val_dataloaders=val)
     trainer.test(model, test)
     if len(argv) > 2:

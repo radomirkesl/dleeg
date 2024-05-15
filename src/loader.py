@@ -58,7 +58,7 @@ def load(
         filter_task: Optional[Task] = None,
         time_frame: Optional[Tuple[int, int]] = None,
         filter_channels: List[str] = POSSIBLE_CHANNELS,
-        filter_noisy: bool = True,
+        ptp_thresh: Optional[int] = 130,
         ) -> DataSet:
     shape = MAX_SHAPE
     if filter_channels:
@@ -71,6 +71,8 @@ def load(
     forced_success_count = 0
     class_balance = [0, 0, 0, 0]
     noisy = set()
+    total_trials = 0
+    refused_trials = 0
     for file in os.listdir(directory_path):
         if not file.endswith('.mat'):
             continue
@@ -78,13 +80,6 @@ def load(
         print(f'Loading file {file_path}...')
         file_data = loadmat(file_path, simplify_cells = 'True')['BCI']
         channel_indices = np.array([np.where(chan == file_data['chaninfo']['label']) for chan in filter_channels]).squeeze()
-        if filter_noisy:
-            noisechans = file_data['chaninfo']['noisechan']
-            if hasattr(noisechans, '__iter__'):
-                for idx in noisechans:
-                    noisy.add(file_data['chaninfo']['label'][idx - 1])
-            elif noisechans:
-                noisy.add(file_data['chaninfo']['label'][noisechans - 1])
 
         for data, trial_data in zip(file_data['data'], file_data['TrialData'], strict = True):
             task = Task(trial_data['tasknumber'])
@@ -93,6 +88,12 @@ def load(
             data = data[channel_indices]
             if time_frame is not None:
                 data = data[:, time_frame[0]:min(time_frame[1], data.shape[1])]
+            if ptp_thresh:
+                total_trials += 1
+                ptp_maxamp = np.max(np.ptp(data, axis=1))
+                if ptp_maxamp > ptp_thresh:
+                    refused_trials += 1
+                    continue
             if data.shape != shape:
                 pad_height = shape[0] - data.shape[0]
                 pad_width = shape[1] - data.shape[1]
@@ -108,13 +109,8 @@ def load(
     gc.collect()
     print(f'Class balance: {class_balance}')
     print(out_data[0].shape)
-    if filter_noisy:
-        print(f'Noisy channels: {noisy}')
-        denoised_channels = [chan for chan in filter_channels if chan not in noisy]
-        denoised_indices = np.array([np.where(chan == np.array(filter_channels)) for chan in denoised_channels]).squeeze()
-        print(f'Denoised indices: {denoised_indices}')
-        out_data = [data[denoised_indices] for data in out_data]
-        print(out_data[0].shape)
+    if ptp_thresh:
+        print(f'Refused by ptp threshold: {(refused_trials/total_trials) * 100:.2f}%')
     return DataSet(
             data = np.array(out_data, dtype = np.float32),
             labels = np.array(out_labels, dtype = np.uint8),
@@ -126,8 +122,8 @@ def load(
 if __name__ == "__main__":
     from sys import argv
     used_channels = [chan for chan in POSSIBLE_CHANNELS if 'C' in chan]
-    ds = load(argv[1], time_frame = (2000, 6000))
-    print(f'Online accuracy: {ds.online_accuracy}\tForced online accuracy: {ds.forced_online_accuracy}')
+    ds = load(argv[1], time_frame = (2000, 6000), filter_channels=used_channels)
+    print(f'Online accuracy: {ds.online_accuracy * 100:.2f}%\tForced online accuracy: {ds.forced_online_accuracy * 100:.2f}%')
     tds = make_dataset(ds)
     torch.save(tds, argv[2])
 
