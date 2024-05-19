@@ -11,14 +11,14 @@ class CNN(L.LightningModule):
         self,
         data_shape,
         in_channels,
-        conv1_kernel = 64,
-        conv2_kernel = 16,
-        conv1_filters = 8,
-        conv2_filters = 16,
-        pool_kernel = 4,
+        conv1_kernel=64,
+        conv2_kernel=16,
+        conv1_filters=8,
+        conv2_filters=16,
+        pool_kernel=4,
         feature_count=4,
-        conv_depth = 2,
-        dropout_rate = 0.5,
+        conv_depth=2,
+        dropout_rate=0.5,
     ):
         super().__init__()
         conv1_out = conv_depth * conv1_filters
@@ -27,7 +27,7 @@ class CNN(L.LightningModule):
                 in_channels=in_channels,
                 kernel_size=conv1_kernel,
                 out_channels=conv1_filters,
-                padding='same',
+                padding="same",
             ),
             nn.BatchNorm1d(conv1_filters),
             # Depthwise conv
@@ -36,7 +36,7 @@ class CNN(L.LightningModule):
                 groups=conv1_filters,
                 kernel_size=conv1_kernel,
                 out_channels=conv1_out,
-                padding='same',
+                padding="same",
             ),
             nn.BatchNorm1d(conv1_out),
             nn.ReLU(),
@@ -50,23 +50,24 @@ class CNN(L.LightningModule):
                 kernel_size=conv2_kernel,
                 out_channels=conv1_out,
                 groups=conv1_out,
-                padding='same'
+                padding="same",
             ),
             nn.Conv1d(
                 in_channels=conv1_out,
                 out_channels=conv2_filters,
                 kernel_size=1,
-                ),
+            ),
             nn.BatchNorm1d(conv2_filters),
             nn.ReLU(),
             nn.AvgPool1d(kernel_size=pool_kernel, stride=1),
             nn.Dropout(dropout_rate),
         )
         self.full = nn.Linear(
-            in_features=self.feature_count_after_convs(data_shape), out_features=feature_count,
+            in_features=self.feature_count_after_convs(data_shape),
+            out_features=feature_count,
         )
         self.loss = nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task='multiclass', num_classes=4)
+        self.accuracy = Accuracy(task="multiclass", num_classes=4)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -86,13 +87,11 @@ class CNN(L.LightningModule):
         return x.numel()
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=0.005)
+        return Adam(self.parameters(), lr=0.001)
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        # print(f'Outputs shape: {outputs.shape}\tLabels shape: {labels.shape}')
-        # print(f'Outputs: {outputs}\nLabels: {labels}')
         loss = self.loss(outputs, labels)
         return loss
 
@@ -100,61 +99,42 @@ class CNN(L.LightningModule):
         inputs, labels = batch
         outputs = self.forward(inputs)
         val_loss = self.loss(outputs, labels)
-        self.log('val_loss', val_loss)
+        self.log("val_loss", val_loss)
 
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
         test_loss = self.loss(outputs, labels)
         self.accuracy(outputs, labels)
-        self.log('test_acc', self.accuracy, on_step=False, on_epoch=True)
-        self.log('test_loss', test_loss)
+        self.log("test_acc", self.accuracy, on_step=False, on_epoch=True)
+        self.log("test_loss", test_loss)
 
 
 if __name__ == "__main__":
     from sys import argv
 
     from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-    from torch.utils.data import random_split
+    from torch.utils.data import DataLoader, random_split
 
     from loader import *
 
     L.seed_everything(seed=42, workers=True)
 
-    used_channels = [chan for chan in POSSIBLE_CHANNELS if 'C' in chan]
-    print(f'Channel count: {len(used_channels)}')
-    # ds = load(
-    #     "../data",
-    #     time_frame=(2000, 6000),
-    #     filter_task=None,
-    #     filter_channels=used_channels,
-    # )
-    # tds = make_dataset(ds)
+    used_channels = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
+    print(f"Channel count: {len(used_channels)}")
     tds: TensorDataset = torch.load(argv[1])
     data_shape = tds[0][0].shape
-    print(f'Data shape: {data_shape}')
+    print(f"Data shape: {data_shape}")
     sets = random_split(tds, [0.64, 0.16, 0.2])
     train, val, test = tuple(DataLoader(s, num_workers=3, batch_size=32) for s in sets)
 
-    model = CNN(
-        (1, *data_shape),
-        in_channels=data_shape[0]
-    )
+    model = CNN((1, *data_shape), in_channels=data_shape[0])
 
-    trainer = L.Trainer(max_epochs=10, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=3)])
+    trainer = L.Trainer(
+        max_epochs=10,
+        callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=3)],
+    )
     trainer.fit(model, train_dataloaders=train, val_dataloaders=val)
     trainer.test(model, test)
     if len(argv) > 2:
         trainer.save_checkpoint(argv[2])
-    
-    # correct = 0
-    # total = 0
-    # for i, (inputs, labels) in enumerate(test):
-    #     outputs = model(inputs)
-    #     for j in range(len(outputs)):
-    #         total += 1
-    #         if torch.argmax(outputs[j]) == labels[j]:
-    #             correct += 1
-    # print(f'Correct: {correct}\tTotal: {total}')
-    # print(f'My Accuracy: {(correct/total) * 100}%')
-

@@ -1,6 +1,5 @@
 import pytorch_lightning as L
 import torch
-import torch.nn.functional as F
 from torch import nn
 from torch.optim import Adam
 from torchmetrics import Accuracy
@@ -12,16 +11,16 @@ class CNN_LSTM(L.LightningModule):
         self,
         data_shape,
         in_channels,
-        conv1_kernel = 64,
-        conv2_kernel = 16,
-        conv1_filters = 8,
-        conv2_filters = 16,
-        pool_kernel = 4,
+        conv1_kernel=64,
+        conv2_kernel=16,
+        conv1_filters=8,
+        conv2_filters=16,
+        pool_kernel=4,
         feature_count=4,
-        conv_depth = 2,
-        dropout_rate = 0.5,
-        hidden_size = 128,
-        lstm_layers = 2,
+        conv_depth=2,
+        dropout_rate=0.5,
+        hidden_size=128,
+        lstm_layers=2,
     ):
         super().__init__()
         conv1_out = conv_depth * conv1_filters
@@ -30,7 +29,7 @@ class CNN_LSTM(L.LightningModule):
                 in_channels=in_channels,
                 kernel_size=conv1_kernel,
                 out_channels=conv1_filters,
-                padding='same',
+                padding="same",
             ),
             nn.BatchNorm1d(conv1_filters),
             # Depthwise conv
@@ -39,7 +38,7 @@ class CNN_LSTM(L.LightningModule):
                 groups=conv1_filters,
                 kernel_size=conv1_kernel,
                 out_channels=conv1_out,
-                padding='same',
+                padding="same",
             ),
             nn.BatchNorm1d(conv1_out),
             nn.ReLU(),
@@ -53,35 +52,34 @@ class CNN_LSTM(L.LightningModule):
                 kernel_size=conv2_kernel,
                 out_channels=conv1_out,
                 groups=conv1_out,
-                padding='same'
+                padding="same",
             ),
             nn.Conv1d(
                 in_channels=conv1_out,
                 out_channels=conv2_filters,
                 kernel_size=1,
-                ),
+            ),
             nn.BatchNorm1d(conv2_filters),
             nn.ReLU(),
             nn.AvgPool1d(kernel_size=pool_kernel, stride=1),
             nn.Dropout(dropout_rate),
         )
         self.lstm = nn.LSTM(
-                input_size=conv2_filters,
-                hidden_size=hidden_size,
-                batch_first=True,
-                num_layers=lstm_layers,
-                )
+            input_size=conv2_filters,
+            hidden_size=hidden_size,
+            batch_first=True,
+            num_layers=lstm_layers,
+        )
         self.full = nn.Linear(
-            in_features=hidden_size, out_features=feature_count,
+            in_features=hidden_size,
+            out_features=feature_count,
         )
         self.loss = nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task='multiclass', num_classes=4)
+        self.accuracy = Accuracy(task="multiclass", num_classes=4)
 
     def forward(self, x):
         x = self.conv1(x)
         x = self.conv2(x)
-
-        # x = torch.flatten(x, 1)
 
         x = x.permute(0, 2, 1)
         x, _ = self.lstm(x)
@@ -97,13 +95,11 @@ class CNN_LSTM(L.LightningModule):
         return x.numel()
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=0.005)
+        return Adam(self.parameters(), lr=0.01)
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        # print(f'Outputs shape: {outputs.shape}\tLabels shape: {labels.shape}')
-        # print(f'Outputs: {outputs}\nLabels: {labels}')
         loss = self.loss(outputs, labels)
         return loss
 
@@ -111,61 +107,51 @@ class CNN_LSTM(L.LightningModule):
         inputs, labels = batch
         outputs = self.forward(inputs)
         val_loss = self.loss(outputs, labels)
-        self.log('val_loss', val_loss)
+        self.log("val_loss", val_loss)
 
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
         test_loss = self.loss(outputs, labels)
         self.accuracy(outputs, labels)
-        self.log('test_acc', self.accuracy, on_step=False, on_epoch=True)
-        self.log('test_loss', test_loss)
+        self.log("test_acc", self.accuracy, on_step=False, on_epoch=True)
+        self.log("test_loss", test_loss)
 
 
 if __name__ == "__main__":
     from sys import argv
 
     from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-    from torch.utils.data import random_split
+    from torch.utils.data import DataLoader, random_split
 
     from loader import *
 
     L.seed_everything(seed=42, workers=True)
 
-    used_channels = [chan for chan in POSSIBLE_CHANNELS if 'C' in chan]
-    print(f'Channel count: {len(used_channels)}')
-    # ds = load(
-    #     "../data",
-    #     time_frame=(2000, 6000),
-    #     filter_task=None,
-    #     filter_channels=used_channels,
-    # )
-    # tds = make_dataset(ds)
+    used_channels = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
+    print(f"Channel count: {len(used_channels)}")
     tds: TensorDataset = torch.load(argv[1])
     data_shape = tds[0][0].shape
-    print(f'Data shape: {data_shape}')
+    print(f"Data shape: {data_shape}")
     sets = random_split(tds, [0.64, 0.16, 0.2])
-    train, val, test = tuple(DataLoader(s, num_workers=3, batch_size=32) for s in sets)
-
-    model = CNN_LSTM(
-        (1, *data_shape),
-        in_channels=data_shape[0]
+    train, val, test = tuple(
+        DataLoader(
+            s,
+            num_workers=3,
+            batch_size=32,
+            shuffle=True,
+            persistent_workers=True,
+        )
+        for s in sets
     )
 
-    trainer = L.Trainer(max_epochs=200, callbacks=[EarlyStopping(monitor='val_loss', mode='min', patience=20)])
+    model = CNN_LSTM((1, *data_shape), in_channels=data_shape[0])
+
+    trainer = L.Trainer(
+        max_epochs=200,
+        callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=20)],
+    )
     trainer.fit(model, train_dataloaders=train, val_dataloaders=val)
     trainer.test(model, test)
     if len(argv) > 2:
         trainer.save_checkpoint(argv[2])
-    
-    # correct = 0
-    # total = 0
-    # for i, (inputs, labels) in enumerate(test):
-    #     outputs = model(inputs)
-    #     for j in range(len(outputs)):
-    #         total += 1
-    #         if torch.argmax(outputs[j]) == labels[j]:
-    #             correct += 1
-    # print(f'Correct: {correct}\tTotal: {total}')
-    # print(f'My Accuracy: {(correct/total) * 100}%')
-
