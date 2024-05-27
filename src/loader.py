@@ -186,7 +186,9 @@ if __name__ == "__main__":
     from sys import argv
 
     used_channels = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
-    ds = load(argv[1], time_frame=(2000, 6000), filter_channels=used_channels)
+    ds = load(
+        argv[1], time_frame=(2000, 6000), filter_channels=used_channels, ptp_thresh=100
+    )
     print(
         f"Online accuracy: {ds.online_accuracy * 100:.2f}%\tForced online accuracy: {ds.forced_online_accuracy * 100:.2f}%"
     )

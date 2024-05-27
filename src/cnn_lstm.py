@@ -1,8 +1,9 @@
 import pytorch_lightning as L
 import torch
 from torch import nn
-from torch.optim import Adam
 from torchmetrics import Accuracy
+
+from optim import build_adam_RLROP
 
 
 class CNN_LSTM(L.LightningModule):
@@ -95,7 +96,7 @@ class CNN_LSTM(L.LightningModule):
         return x.numel()
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=0.01)
+        return build_adam_RLROP(self.parameters())
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
@@ -121,37 +122,17 @@ class CNN_LSTM(L.LightningModule):
 if __name__ == "__main__":
     from sys import argv
 
-    from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-    from torch.utils.data import DataLoader, random_split
+    from torch.utils.data import TensorDataset
 
-    from loader import *
+    from run import KFoldRunner
 
-    L.seed_everything(seed=42, workers=True)
-
-    used_channels = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
-    print(f"Channel count: {len(used_channels)}")
     tds: TensorDataset = torch.load(argv[1])
     data_shape = tds[0][0].shape
     print(f"Data shape: {data_shape}")
-    sets = random_split(tds, [0.64, 0.16, 0.2])
-    train, val, test = tuple(
-        DataLoader(
-            s,
-            num_workers=3,
-            batch_size=32,
-            shuffle=True,
-            persistent_workers=True,
-        )
-        for s in sets
-    )
-
-    model = CNN_LSTM((1, *data_shape), in_channels=data_shape[0])
-
-    trainer = L.Trainer(
-        max_epochs=200,
-        callbacks=[EarlyStopping(monitor="val_loss", mode="min", patience=20)],
-    )
-    trainer.fit(model, train_dataloaders=train, val_dataloaders=val)
-    trainer.test(model, test)
+    model = CNN_LSTM((1, *data_shape), in_channels=data_shape[0], lstm_layers=1)
     if len(argv) > 2:
-        trainer.save_checkpoint(argv[2])
+        model_save = argv[2]
+    else:
+        model_save = None
+    runner = KFoldRunner(model=model, data=tds, save_path=model_save)
+    runner.run()
