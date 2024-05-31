@@ -2,11 +2,13 @@ import gc
 import os
 from dataclasses import dataclass
 from enum import IntEnum
+from sys import argv
 from typing import List, Optional, Tuple
 
 import numpy as np
 import torch
 from scipy.io import loadmat
+from torch import Size
 from torch.utils.data import TensorDataset
 
 CHANNEL_COUNT = 62
@@ -93,18 +95,42 @@ class Target(IntEnum):
 
 @dataclass
 class DataSet:
-    data: np.ndarray
-    labels: np.ndarray
+    ds: TensorDataset
+    item_shape: Size
+    used_channels: List[str]
     online_accuracy: float
     forced_online_accuracy: float
     class_balance: Tuple[int, ...]
-    ptp_refused_percent: float
+    ptp_refused: float
+    used_task: Optional[Task]
+    time_frame: Optional[Tuple[int, int]]
+    ptp_thresh: Optional[int]
 
+    def print_stats(self):
+        print("----------------------  DATASET SIZE  --------------------")
+        print(f"Item shape:\t{self.item_shape}")
+        print(f"Total items:\t{len(self.ds)}")
+        print()
 
-def make_dataset(dataset: DataSet) -> TensorDataset:
-    data = torch.tensor(dataset.data, dtype=torch.float32)
-    labels = torch.tensor(dataset.labels, dtype=torch.uint8)
-    return TensorDataset(data, labels)
+        print("-----------------  TIME-SPACE SELECTION  -----------------")
+        print(f"{len(self.used_channels)} channels used: {self.used_channels}")
+        print(f"Time frame: {self.time_frame}")
+        print()
+
+        print("--------------------  ONLINE RESULTS  --------------------")
+        print(f"Online accuracy:\t{self.online_accuracy * 100:.2f}%")
+        print(f"Forced online accuracy:\t{self.forced_online_accuracy * 100:.2f}%")
+        print()
+
+        print("---------------  ARTIFACT REMOVAL EFFECTS  ---------------")
+        print(f"Point to point threshold:\t{self.ptp_thresh}")
+        print(f"Refused by ptp threshold:\t{self.ptp_refused * 100:.2f}%")
+        print(f"Class balance:\t{self.class_balance}")
+        print()
+
+        print("-------------------------  TASK  -------------------------")
+        print(f"Task used:\t{self.used_task if self.used_task else 'All'}")
+        print()
 
 
 def load(
@@ -167,32 +193,34 @@ def load(
             class_balance[label] += 1
             out_labels.append(label)
     gc.collect()
-    print(out_data[0].shape)
     if ptp_thresh:
-        refused_percent = (refused_trials / total_trials) * 100
+        refused_percent = refused_trials / total_trials
     else:
         refused_percent = 0
+    data = torch.tensor(np.array(out_data, dtype=np.float32), dtype=torch.float32)
+    labels = torch.tensor(np.array(out_labels, dtype=np.uint8), dtype=torch.uint8)
+    ds = TensorDataset(data, labels)
     return DataSet(
-        data=np.array(out_data, dtype=np.float32),
-        labels=np.array(out_labels, dtype=np.uint8),
+        ds=ds,
+        time_frame=time_frame,
+        ptp_thresh=ptp_thresh,
+        used_task=filter_task,
+        item_shape=ds[0][0].shape,
+        used_channels=filter_channels,
         online_accuracy=success_count / len(out_data),
         forced_online_accuracy=forced_success_count / len(out_data),
         class_balance=tuple(class_balance),
-        ptp_refused_percent=refused_percent,
+        ptp_refused=refused_percent,
     )
 
 
 if __name__ == "__main__":
-    from sys import argv
-
     used_channels = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
     ds = load(
-        argv[1], time_frame=(2000, 6000), filter_channels=used_channels, ptp_thresh=100
+        argv[1],
+        time_frame=(2000, 6000),
+        filter_channels=used_channels,
     )
-    print(
-        f"Online accuracy: {ds.online_accuracy * 100:.2f}%\tForced online accuracy: {ds.forced_online_accuracy * 100:.2f}%"
-    )
-    print(f"Class balance: {ds.class_balance}")
-    print(f"Refused by ptp threshold: {ds.ptp_refused_percent:.2f}%")
-    tds = make_dataset(ds)
-    torch.save(tds, argv[2])
+    ds.print_stats()
+    torch.save(ds, argv[2])
+

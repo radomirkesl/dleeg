@@ -115,17 +115,15 @@ class CNN(L.LightningModule):
 if __name__ == "__main__":
     from sys import argv
 
-    from torch.utils.data import TensorDataset
+    from loader import DataSet
+    from run import KFoldRunner
 
-    from run import Runner
-
-    tds: TensorDataset = torch.load(argv[1])
-    data_shape = tds[0][0].shape
-    print(f"Data shape: {data_shape}")
-    model = CNN((1, *data_shape), in_channels=data_shape[0])
+    ds: DataSet = torch.load(argv[1])
+    ds.print_stats()
+    model = CNN((1, *ds.item_shape), in_channels=ds.item_shape[0])
     if len(argv) > 2:
         model_save = argv[2]
     else:
         model_save = None
-    runner = Runner(model=model, data=tds, save_path=model_save)
+    runner = KFoldRunner(model=model, data=ds.ds, save_path=model_save)
     runner.run()

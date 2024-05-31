@@ -10,8 +10,7 @@ def build_adam_RLROP(
     initial_learning_rate: float = 0.1,
     factor: float = 0.1,
     patience: int = 5,
-    cooldown: int = 5,
-    verbose=True,
+    cooldown: int = 3,
 ) -> Tuple[List[optim.Optimizer], List[Dict[str, object]]]:
     optimizer = optim.Adam(parameters, lr=initial_learning_rate)
 
@@ -23,7 +22,6 @@ def build_adam_RLROP(
             factor=factor,
             patience=patience,
             cooldown=cooldown,
-            verbose=verbose,
         ),
         # Metric to monitor
         "monitor": "val_loss",
