@@ -23,10 +23,7 @@ RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 torch.manual_seed(RANDOM_SEED)
 
-all_data = loadmat('../data/S1_Session_9.mat', simplify_cells=True)['BCI']
+all_data = loadmat('../data/subject_25/S25_Session_7.mat', simplify_cells=True)['BCI']
 
-print(type(all_data['chaninfo']['label']))
-print(all_data['chaninfo']['label'])
-print(np.where(all_data['chaninfo']['label'] == 'C3'))
-print(all_data['chaninfo']['noisechan'])
+print(all_data['metadata'])
 

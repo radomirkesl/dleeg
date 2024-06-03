@@ -122,8 +122,8 @@ class CNN_LSTM(L.LightningModule):
 if __name__ == "__main__":
     from sys import argv
 
-    from loader import DataSet
-    from run import KFoldRunner
+    from loader import *
+    from run import KFoldRunner, Runner
 
     ds: DataSet = torch.load(argv[1])
     ds.print_stats()
@@ -132,5 +132,5 @@ if __name__ == "__main__":
         model_save = argv[2]
     else:
         model_save = None
-    runner = KFoldRunner(model=model, data=ds.ds, save_path=model_save)
+    runner = Runner(model=model, data=ds.ds, save_path=model_save)
     runner.run()

@@ -115,7 +115,7 @@ class CNN(L.LightningModule):
 if __name__ == "__main__":
     from sys import argv
 
-    from loader import DataSet
+    from loader import *
     from run import KFoldRunner
 
     ds: DataSet = torch.load(argv[1])
