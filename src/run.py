@@ -1,3 +1,5 @@
+from datetime import timedelta
+from time import time
 from typing import List, Optional
 
 import pytorch_lightning as L
@@ -54,6 +56,7 @@ class Runner:
         )
 
     def run(self):
+        tick = time()
         self.trainer.fit(
             self.model,
             train_dataloaders=self.train,
@@ -62,6 +65,8 @@ class Runner:
         self.trainer.test(self.model, self.test)
         if self.save_path:
             self.trainer.save_checkpoint(self.save_path)
+        tock = time()
+        print(f"Elapsed time: {timedelta(seconds=tock - tick)}")
 
 
 class KFoldRunner:
@@ -103,6 +108,7 @@ class KFoldRunner:
         )
 
     def run(self):
+        tick = time()
         for fold, (train_idx, val_idx) in enumerate(self.folds):
             print(f"FOLD {fold}")
             print("--------------------------------")
@@ -148,3 +154,5 @@ class KFoldRunner:
         self.trainer.test(self.model, self.test)
         if self.save_path:
             self.trainer.save_checkpoint(self.save_path)
+        tock = time()
+        print(f"Elapsed time: {timedelta(seconds=tock - tick)}")
