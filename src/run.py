@@ -1,6 +1,6 @@
 from datetime import timedelta
 from time import time
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import pytorch_lightning as L
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
@@ -20,7 +20,7 @@ class Runner:
         seed: int = 42,
         max_epochs: int = 200,
         patience: int = 20,
-        set_split: List = [0.64, 0.16, 0.2],
+        set_split: Tuple[float, float, float] = (0.64, 0.16, 0.2),
     ) -> None:
         L.seed_everything(seed=seed, workers=True)
 
@@ -82,7 +82,7 @@ class KFoldRunner:
         max_epochs: int = 100,
         patience: int = 10,
         num_folds: int = 5,
-        set_split: List = [0.8, 0.2],
+        set_split: Tuple[float, float] = (0.8, 0.2),
     ) -> None:
 
         L.seed_everything(seed=seed, workers=True)
@@ -106,6 +106,16 @@ class KFoldRunner:
             persistent_workers=True,
             pin_memory=pin_memory,
         )
+            # checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode="min")
+        self.trainer = L.Trainer(
+                max_epochs=self.max_epochs,
+                callbacks=[
+                    EarlyStopping(
+                        monitor="val_loss", patience=self.patience, mode="min"
+                        ),
+                    # checkpoint_callback,
+                    ],
+                )
 
     def run(self):
         tick = time()
@@ -131,18 +141,6 @@ class KFoldRunner:
                 shuffle=False,
                 persistent_workers=True,
                 pin_memory=self.pin_memory,
-            )
-
-            # checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode="min")
-
-            self.trainer = L.Trainer(
-                max_epochs=self.max_epochs,
-                callbacks=[
-                    EarlyStopping(
-                        monitor="val_loss", patience=self.patience, mode="min"
-                    ),
-                    # checkpoint_callback,
-                ],
             )
 
             self.trainer.fit(
