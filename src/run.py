@@ -1,9 +1,10 @@
 from datetime import timedelta
 from time import time
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 import pytorch_lightning as L
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
 from sklearn.model_selection import KFold
 from torch.utils.data import DataLoader, Subset, TensorDataset, random_split
 
@@ -51,7 +52,8 @@ class Runner:
         self.trainer = L.Trainer(
             max_epochs=max_epochs,
             callbacks=[
-                EarlyStopping(monitor="val_loss", mode="min", patience=patience)
+                EarlyStopping(monitor="val_loss", mode="min", patience=patience),
+                LearningRateMonitor(logging_interval='epoch'),
             ],
         )
 
@@ -106,16 +108,15 @@ class KFoldRunner:
             persistent_workers=True,
             pin_memory=pin_memory,
         )
-            # checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode="min")
+        # checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode="min")
         self.trainer = L.Trainer(
-                max_epochs=self.max_epochs,
-                callbacks=[
-                    EarlyStopping(
-                        monitor="val_loss", patience=self.patience, mode="min"
-                        ),
-                    # checkpoint_callback,
-                    ],
-                )
+            max_epochs=self.max_epochs,
+            callbacks=[
+                EarlyStopping(monitor="val_loss", patience=self.patience, mode="min"),
+                LearningRateMonitor(logging_interval='epoch'),
+                # checkpoint_callback,
+            ],
+        )
 
     def run(self):
         tick = time()

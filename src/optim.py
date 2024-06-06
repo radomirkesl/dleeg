@@ -29,6 +29,7 @@ def build_adam_RLROP(
         "interval": "epoch",
         # Check learning rate every n epochs
         "frequency": 1,
+        "name": "lr",
     }
 
     return [optimizer], [scheduler]

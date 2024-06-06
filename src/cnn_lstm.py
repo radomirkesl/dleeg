@@ -1,8 +1,8 @@
 import pytorch_lightning as L
 import torch
-from torch import nn
-from torchmetrics import Accuracy
+from torch import log, nn
 
+from metrics import build_scalar_metrics
 from optim import build_adam_RLROP
 
 
@@ -19,7 +19,7 @@ class CNN_LSTM(L.LightningModule):
         pool_kernel=4,
         feature_count=4,
         conv_depth=2,
-        dropout_rate=0.5,
+        dropout_rate=0.2,
         hidden_size=128,
         lstm_layers=2,
     ):
@@ -70,13 +70,14 @@ class CNN_LSTM(L.LightningModule):
             hidden_size=hidden_size,
             batch_first=True,
             num_layers=lstm_layers,
+            dropout=dropout_rate,
         )
         self.full = nn.Linear(
             in_features=hidden_size,
             out_features=feature_count,
         )
         self.loss = nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task="multiclass", num_classes=4)
+        self.metrics = build_scalar_metrics()
 
     def forward(self, x):
         x = self.conv1(x)
@@ -113,10 +114,8 @@ class CNN_LSTM(L.LightningModule):
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        test_loss = self.loss(outputs, labels)
-        self.accuracy(outputs, labels)
-        self.log("test_acc", self.accuracy, on_step=False, on_epoch=True)
-        self.log("test_loss", test_loss)
+        metrics = self.metrics(outputs, labels)
+        self.log_dict(metrics, on_step=False, on_epoch=True)
 
 
 if __name__ == "__main__":

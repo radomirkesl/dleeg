@@ -1,6 +1,5 @@
 from sys import argv
 
-import pytorch_lightning as L
 import torch
 
 from cnn_lstm import CNN_LSTM
@@ -16,5 +15,5 @@ if __name__ == "__main__":
         model_save = argv[2]
     else:
         model_save = None
-    runner = Runner(model=model, data=ds.ds, save_path=model_save)
+    runner = Runner(model=model, data=ds.ds, save_path=model_save, max_epochs=1)
     runner.run()
