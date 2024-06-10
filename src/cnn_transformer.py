@@ -30,7 +30,7 @@ class CNNTransformer(L.LightningModule):
     def __init__(
         self,
         data_shape,
-        in_channels,
+        in_channels=4,
         conv1_kernel=64,
         conv2_kernel=16,
         conv1_filters=8,
@@ -128,7 +128,7 @@ class CNNTransformer(L.LightningModule):
         return x
 
     def feature_count_after_convs(self, data_shape):
-        x = torch.zeros(data_shape)
+        x = torch.zeros((1, data_shape[1:]))
         x = self.conv1(x)
         x = self.conv2(x)
 
@@ -161,15 +161,15 @@ class CNNTransformer(L.LightningModule):
 if __name__ == "__main__":
     from sys import argv
 
-    from loader import *
-    from run import KFoldRunner
+    from torch.utils.data import TensorDataset
 
-    ds: DataSet = torch.load(argv[1])
-    ds.print_stats()
-    model = CNNTransformer((1, *ds.item_shape), in_channels=ds.item_shape[0])
+    from run import Runner
+
+    ds: TensorDataset = torch.load(argv[1])
+    model = CNNTransformer(data_shape=ds.tensors[0][0].shape)
     if len(argv) > 2:
         model_save = argv[2]
     else:
         model_save = None
-    runner = KFoldRunner(model=model, data=ds.ds, save_path=model_save)
+    runner = Runner(model=model, data=ds, save_path=model_save)
     runner.run()

@@ -1,20 +1,16 @@
 import gc
-import os
 from dataclasses import dataclass
 from enum import IntEnum
+from pathlib import Path
 from sys import argv
-from typing import Dict, List, Literal, Optional, Set, Tuple
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple
 
 import numpy as np
 import torch
 from lightning_fabric.plugins.environments.slurm import re
 from scipy.io import loadmat
-from torch import Size
 from torch.utils.data import TensorDataset
 
-CHANNEL_COUNT = 62
-MAX_DATA_LEN = 11041
-MAX_SHAPE = (CHANNEL_COUNT, MAX_DATA_LEN)
 POSSIBLE_CHANNELS = [
     "FP1",
     "FPZ",
@@ -79,19 +75,16 @@ POSSIBLE_CHANNELS = [
     "O2",
     "CB2",
 ]
+MAX_CHANNEL_COUNT = len(POSSIBLE_CHANNELS)
+MAX_DATA_LEN = 11041
+MAX_SHAPE = (MAX_CHANNEL_COUNT, MAX_DATA_LEN)
+C_CHANNELS = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
 
 
 class Task(IntEnum):
     LEFT_RIGHT = 1
     UP_DOWN = 2
     TWO_DIM = 3
-
-
-class Target(IntEnum):
-    RIGHT = 1
-    LEFT = 2
-    UP = 3
-    DOWN = 4
 
 
 @dataclass
@@ -110,6 +103,14 @@ class LoadDomain:
 Time Frame: {self.time_frame if self.time_frame else 'FULL'}
 {len(self.channels)} Channels:
 {chan_string}"""
+    
+    def to_dict_hr(self) -> Dict[str, Any]:
+        return {
+            "task": self.task.name.replace("_", " ") if self.task else "ALL",
+            "time_frame": self.time_frame if self.time_frame else "FULL",
+            "channel_count": len(self.channels),
+            "channels": self.channels,
+        }
 
 
 @dataclass
@@ -123,6 +124,19 @@ class SubjectSpec:
     athlete: Optional[List[Literal["Y", "U", "N"]]] = None
     handsport: Optional[List[Literal["Y", "U", "N"]]] = None
     hobby: Optional[List[Literal["Y", "U", "N"]]] = None
+
+    def to_dict_hr(self) -> Dict[str, Any]:
+        return {
+                "gender": self.gender if self.gender else "ANY",
+                "age_range": self.age_range if self.age_range else "ANY",
+                "handedness": self.handedness if self.handedness else "ANY",
+                "mbsr": self.mbsr if self.mbsr else "IRRELEVANT",
+                "meditation_hours_range": self.meditation_hours_range if self.meditation_hours_range else "ANY",
+                "instrument": self.instrument if self.instrument else "IRRELEVANT",
+                "athlete": self.athlete if self.athlete else "IRRELEVANT",
+                "handsport": self.handsport if self.handsport else "IRRELEVANT",
+                "hobby": self.hobby if self.hobby else "IRRELEVANT",
+        }
 
     def passes(self, subject_metadata: Dict) -> bool:
         if self.gender and subject_metadata["gender"] != self.gender:
@@ -160,60 +174,73 @@ Hobby: {self.hobby if self.hobby else 'IRRELEVANT'}"""
 
 
 @dataclass
-class DataSet:
-    ds: TensorDataset
-    item_shape: Size
+class DataSetStats:
+    shape: Tuple[int, ...]
     online_accuracy: float
     forced_online_accuracy: float
     class_balance: Tuple[int, ...]
     ptp_refused: float
     ptp_thresh: Optional[int]
-    subjects: Set[int]
+    subjects: Tuple[int, ...]
     domain: LoadDomain
     subject_spec: Optional[SubjectSpec] = None
 
-    def print_stats(self):
-        print()
-        print("----------------------  DATASET SIZE  --------------------")
-        print(f"Item shape:\t{self.item_shape}")
-        print(f"Total items:\t{len(self.ds)}")
-        print()
+    def to_dict_hr(self) -> Dict[str, Any]:
+        return {
+            "shape": self.shape,
+            "online_accuracy": self.online_accuracy,
+            "forced_online_accuracy": self.forced_online_accuracy,
+            "class_balance": self.class_balance,
+            "ptp_refused": self.ptp_refused,
+            "ptp_thresh": self.ptp_thresh,
+            "domain": self.domain.to_dict_hr(),
+            "subject_spec": self.subject_spec.to_dict_hr() if self.subject_spec else "NONE",
+            "subject_count": len(self.subjects),
+            "subjects": self.subjects,
+        }
 
-        print("------------------------  DOMAIN  ------------------------")
-        print(self.domain)
-        print()
+    def __str__(self):
+        output = "\n"
+        output += "----------------------  DATASET SIZE  --------------------\n"
+        output += f"Item shape:\t{self.shape}\n"
+        output += "\n"
 
-        print("--------------------  ONLINE RESULTS  --------------------")
-        print(f"Online accuracy:\t{self.online_accuracy * 100:.2f}%")
-        print(f"Forced online accuracy:\t{self.forced_online_accuracy * 100:.2f}%")
-        print()
+        output += "------------------------  DOMAIN  ------------------------\n"
+        output += str(self.domain)
+        output += "\n"
 
-        print("---------------  ARTIFACT REMOVAL EFFECTS  ---------------")
-        print(f"Point to point threshold:\t{self.ptp_thresh}")
-        print(f"Refused by ptp threshold:\t{self.ptp_refused * 100:.2f}%")
-        print(f"Class balance:\t{self.class_balance}")
-        print()
+        output += "--------------------  ONLINE RESULTS  --------------------\n"
+        output += f"Online accuracy:\t{self.online_accuracy * 100:.2f}%\n"
+        output += f"Forced online accuracy:\t{self.forced_online_accuracy * 100:.2f}%\n"
+        output += "\n"
 
-        print("----------------  SUBJECT SPECIFICATION  -----------------")
+        output += "---------------  ARTIFACT REMOVAL EFFECTS  ---------------\n"
+        output += f"Point to point threshold:\t{self.ptp_thresh}\n"
+        output += f"Refused by ptp threshold:\t{self.ptp_refused * 100:.2f}%\n"
+        output += f"Class balance:\t{self.class_balance}\n"
+        output += "\n"
+
+        output += "----------------  SUBJECT SPECIFICATION  -----------------\n"
         if self.subject_spec:
-            print(self.subject_spec)
+            output += str(self.subject_spec)
         else:
-            print("No subject specification applied.")
-        print()
+            output += "No subject specification applied.\n"
+        output += "\n"
 
-        print("-----------------------  SUBJECTS  -----------------------")
+        output += "-----------------------  SUBJECTS  -----------------------\n"
         sub_string = ""
         for i, chan in enumerate(self.subjects):
             sub_string += f"{chan},".ljust(4)
             if i % 10 == 9:
                 sub_string += "\n"
-        print(f"{len(self.subjects)} subjects:")
-        print(sub_string)
-        print()
+        output += f"{len(self.subjects)} subjects:\n"
+        output += sub_string
+        output += "\n\n"
+        return output
 
 
 def extract_integers(filename: str) -> Tuple[int | None, int | None]:
-    pattern = r"S(\d+)_Session_(\d+)\.mat"
+    pattern = r"S(\d+)_Session_(\d+)"
     
     match = re.search(pattern, filename)
     
@@ -227,7 +254,7 @@ def extract_integers(filename: str) -> Tuple[int | None, int | None]:
 class Loader:
     def __init__(
         self,
-        domain: LoadDomain = LoadDomain(task=None, time_frame=(2000, 6000), channels=POSSIBLE_CHANNELS),
+        domain: LoadDomain = LoadDomain(task=None, time_frame=(2000, 6000), channels=C_CHANNELS),
         subject_spec: Optional[SubjectSpec] = None,
         ptp_thresh: Optional[int] = 130,
         ) -> None:
@@ -253,28 +280,27 @@ class Loader:
 
     def load_dir(
             self,
-        directory_path: str,
-    ) -> DataSet:
-        files = os.listdir(directory_path)
+        directory_path: Path,
+    ) -> Tuple[TensorDataset, DataSetStats]:
+        files = list(directory_path.glob("*.mat"))
         file_count = len(files)
         for i, file in enumerate(files, start=1):
-            file_path = directory_path + "/" + file
+            file_path = file
             print(f"Processing file ({i}/{file_count}) {file_path}...")
-            if not file.endswith(".mat"):
-                print(f"Skipping {file_path} (not a .mat file).")
-                continue
             try:
                 file_data = loadmat(file_path, simplify_cells="True")["BCI"]
                 if self.subject_spec and not self.subject_spec.passes(file_data["metadata"]):
-                    print(f"Skipping {file_path} (subject does not fit specification).")
+                    # print(f"Skipping {file_path} (subject does not fit specification).")
                     continue
-                subject, _ = extract_integers(file)
+                subject, _ = extract_integers(file.stem)
                 if subject:
                     self.subjects.add(subject)
                 self.process_data(file_data)
             except Exception as e:
                 print(f"Invalid file: {file_path}, received error: {e}")
             gc.collect()
+        if len(self.out_data) == 0:
+            raise ValueError("No data loaded. There are no files in the directory that are valid and match the criteria.")
         if self.ptp_thresh:
             refused = self.refused_trials / self.total_trials
         else:
@@ -282,15 +308,14 @@ class Loader:
         data = torch.tensor(np.array(self.out_data, dtype=np.float32), dtype=torch.float32)
         labels = torch.tensor(np.array(self.out_labels, dtype=np.uint8), dtype=torch.uint8)
         ds = TensorDataset(data, labels)
-        return DataSet(
-            ds=ds,
+        return ds, DataSetStats(
             ptp_thresh=self.ptp_thresh,
-            item_shape=ds[0][0].shape,
+            shape=data.shape,
             online_accuracy=self.success_count / len(self.out_data),
             forced_online_accuracy=self.forced_success_count / len(self.out_data),
             class_balance=tuple(self.class_balance),
             ptp_refused=refused,
-            subjects=self.subjects,
+            subjects=tuple(self.subjects),
             domain=self.domain,
             subject_spec=self.subject_spec,
         )
@@ -323,10 +348,7 @@ class Loader:
                         continue
                 if data.shape[1] != self.shape[1]:
                     pad_width = self.shape[1] - data.shape[1]
-                    # print(f"Padding occurs! Adding {pad_width} samples to {data.shape[1]} samples.")
-                    # print(f"Original: {data[0]}")
                     data = np.pad(data, pad_width=((0, 0), (0, pad_width)), mode="reflect")
-                    # print(f"Padded: {data[0]}")
                 if trial_data["result"] == 1:
                     self.success_count += 1
                 if trial_data["forcedresult"]:
@@ -341,7 +363,7 @@ if __name__ == "__main__":
     domain = LoadDomain(task=None, time_frame=(2000, 6000), channels=used_channels)
     subject_spec = SubjectSpec(gender="F", age_range=(18, 28), handedness="R")
     loader = Loader(domain=domain, subject_spec=subject_spec)
-    ds = loader.load_dir(argv[1])
-    ds.print_stats()
+    ds, stats = loader.load_dir(Path(argv[1]))
+    print(stats)
     torch.save(ds, argv[2])
 

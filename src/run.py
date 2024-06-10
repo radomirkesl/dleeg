@@ -15,8 +15,8 @@ class Runner:
         model: L.LightningModule,
         data: TensorDataset,
         save_path: Optional[str] = None,
-        workers: int = 3,
-        batch_size: int = 32,
+        workers: int = 11,
+        batch_size: int = 64,
         pin_memory: bool = True,
         seed: int = 42,
         max_epochs: int = 200,
@@ -53,7 +53,7 @@ class Runner:
             max_epochs=max_epochs,
             callbacks=[
                 EarlyStopping(monitor="val_loss", mode="min", patience=patience),
-                LearningRateMonitor(logging_interval='epoch'),
+                LearningRateMonitor(logging_interval="epoch"),
             ],
         )
 
@@ -77,8 +77,8 @@ class KFoldRunner:
         model: L.LightningModule,
         data: TensorDataset,
         save_path: Optional[str] = None,
-        workers: int = 3,
-        batch_size: int = 32,
+        workers: int = 11,
+        batch_size: int = 64,
         pin_memory: bool = True,
         seed: int = 42,
         max_epochs: int = 100,
@@ -113,7 +113,7 @@ class KFoldRunner:
             max_epochs=self.max_epochs,
             callbacks=[
                 EarlyStopping(monitor="val_loss", patience=self.patience, mode="min"),
-                LearningRateMonitor(logging_interval='epoch'),
+                LearningRateMonitor(logging_interval="epoch"),
                 # checkpoint_callback,
             ],
         )

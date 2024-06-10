@@ -1,7 +1,6 @@
 import pytorch_lightning as L
 import torch
 from torch import nn
-from torch.optim import Adam
 from torchmetrics import Accuracy
 
 from optim import build_adam_RLROP
@@ -118,9 +117,9 @@ if __name__ == "__main__":
     from loader import *
     from run import KFoldRunner
 
-    ds: DataSet = torch.load(argv[1])
+    ds: DataSetStats = torch.load(argv[1])
     ds.print_stats()
-    model = CNN((1, *ds.item_shape), in_channels=ds.item_shape[0])
+    model = CNN((1, *ds.shape), in_channels=ds.shape[0])
     if len(argv) > 2:
         model_save = argv[2]
     else:

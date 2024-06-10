@@ -288,5 +288,6 @@ TSWLatexianTemp*
 mats
 *.ckpt
 *.ds
+*.json
 
 .idea

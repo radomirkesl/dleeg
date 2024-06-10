@@ -1,13 +1,17 @@
 from torchmetrics import MetricCollection
-from torchmetrics.classification import (MulticlassAccuracy, MulticlassAUROC,
-                                         MulticlassConfusionMatrix,
-                                         MulticlassF1Score,
-                                         MulticlassPrecision, MulticlassRecall)
+from torchmetrics.classification import (
+    MulticlassAccuracy,
+    MulticlassAUROC,
+    MulticlassConfusionMatrix,
+    MulticlassF1Score,
+    MulticlassPrecision,
+    MulticlassRecall,
+)
 
 CLASS_NUM = 4
 
 
-def build_scalar_metrics() -> MetricCollection:
+def build_general_metrics() -> MetricCollection:
     return MetricCollection(
         {
             "accuracy_macro": MulticlassAccuracy(
@@ -31,7 +35,7 @@ def build_scalar_metrics() -> MetricCollection:
     )
 
 
-def build_vector_metrics() -> MetricCollection:
+def build_classwise_metrics() -> MetricCollection:
     return MetricCollection(
         {
             "accuracy_classwise": MulticlassAccuracy(
@@ -42,9 +46,6 @@ def build_vector_metrics() -> MetricCollection:
             ),
             "recall_classwise": MulticlassRecall(num_classes=CLASS_NUM, average=None),
             "f1_classwise": MulticlassF1Score(num_classes=CLASS_NUM, average=None),
-            "confusion_matrix": MulticlassConfusionMatrix(
-                num_classes=CLASS_NUM, normalize="true"
-            ),
             "auroc_classwise": MulticlassAUROC(num_classes=CLASS_NUM, average=None),
         }
     )
