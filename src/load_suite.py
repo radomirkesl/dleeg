@@ -1,6 +1,8 @@
 import json
+from datetime import timedelta
 from pathlib import Path
 from sys import argv
+from time import time
 
 import torch
 
@@ -19,6 +21,7 @@ class LoadSuite:
         print("------------------------------------")
         experiment_output = self.outputs_dir / experiment_name
         experiment_output.mkdir(exist_ok=True)
+        tick = time()
         try:
             ds, stats = loader.load_dir(self.inputs_dir)
         except Exception as e:
@@ -27,6 +30,10 @@ class LoadSuite:
         with open(experiment_output / "data_stats.json", "w") as f:
             json.dump(stats.to_dict_hr(), f, indent=4)
         torch.save(ds, experiment_output / "data.ds")
+        tock = time()
+        print("--------------------------------------------")
+        print(f"Loading {experiment_name} took {timedelta(seconds=tock - tick)}")
+        print("--------------------------------------------")
 
 
 if __name__ == "__main__":

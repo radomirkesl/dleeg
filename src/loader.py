@@ -257,6 +257,7 @@ class Loader:
         domain: LoadDomain = LoadDomain(task=None, time_frame=(2000, 6000), channels=C_CHANNELS),
         subject_spec: Optional[SubjectSpec] = None,
         ptp_thresh: Optional[int] = 130,
+        verbose: bool = False,
         ) -> None:
         self.domain = domain
         self.subject_spec = subject_spec
@@ -264,6 +265,7 @@ class Loader:
         self.time_frame = domain.time_frame
         self.filter_channels = domain.channels
         self.ptp_thresh = ptp_thresh
+        self.verbose = verbose
 
         self.shape = MAX_SHAPE
         self.shape = (len(self.filter_channels), self.shape[1])
@@ -286,7 +288,8 @@ class Loader:
         file_count = len(files)
         for i, file in enumerate(files, start=1):
             file_path = file
-            print(f"Processing file ({i}/{file_count}) {file_path}...")
+            if self.verbose:
+                print(f"Processing file ({i}/{file_count}) {file_path}...")
             try:
                 file_data = loadmat(file_path, simplify_cells="True")["BCI"]
                 if self.subject_spec and not self.subject_spec.passes(file_data["metadata"]):
