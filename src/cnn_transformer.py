@@ -88,7 +88,7 @@ class CNNTransformer(L.LightningModule):
         # Positional Encoding
         self.positional_encoding = PositionalEncoding(
             d_model=conv2_filters,
-            max_len=data_shape[2],
+            max_len=data_shape[1],
         )
 
         # Transformer Layers
