@@ -10,7 +10,7 @@ from run import Runner
 if __name__ == "__main__":
 
     ds: TensorDataset = torch.load(argv[1])
-    model = CNNTransformer(data_shape=ds.tensors[0].shape)
+    model = CNNTransformer(data_shape=ds.tensors[0][0].shape)
     if len(argv) > 2:
         model_save = argv[2]
     else:

@@ -128,7 +128,7 @@ class CNNTransformer(L.LightningModule):
         return x
 
     def feature_count_after_convs(self, data_shape):
-        x = torch.zeros((1, data_shape[1:]))
+        x = torch.zeros((1, data_shape[0], data_shape[1]))
         x = self.conv1(x)
         x = self.conv2(x)
 
