@@ -30,7 +30,6 @@ class CNNTransformer(L.LightningModule):
     def __init__(
         self,
         data_shape,
-        in_channels=4,
         conv1_kernel=64,
         conv2_kernel=16,
         conv1_filters=8,
@@ -46,7 +45,7 @@ class CNNTransformer(L.LightningModule):
         conv1_out = conv_depth * conv1_filters
         self.conv1 = nn.Sequential(
             nn.Conv1d(
-                in_channels=in_channels,
+                in_channels=data_shape[0],
                 kernel_size=conv1_kernel,
                 out_channels=conv1_filters,
                 padding="same",

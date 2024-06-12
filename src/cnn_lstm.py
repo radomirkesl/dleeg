@@ -13,7 +13,7 @@ class CNN_LSTM(L.LightningModule):
 
     def __init__(
         self,
-        in_channels=4,
+        in_channels,
         conv1_kernel=64,
         conv2_kernel=16,
         conv1_filters=8,
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     from run import Runner
 
     ds: TensorDataset = torch.load(argv[1])
-    model = CNN_LSTM(lstm_layers=1)
+    model = CNN_LSTM(in_channels=ds[0][0].shape[0], lstm_layers=1)
     if len(argv) > 2:
         model_save = argv[2]
     else:
