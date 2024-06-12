@@ -39,8 +39,8 @@ class CNNTransformer(L.LightningModule):
         num_classes=4,
         conv_depth=2,
         dropout_rate=0.5,
-        transformer_heads=12,
-        transformer_layers=12,
+        transformer_heads=8,
+        transformer_layers=8,
     ):
         super().__init__()
         conv1_out = conv_depth * conv1_filters
