@@ -14,5 +14,5 @@ if __name__ == "__main__":
         model_save = argv[2]
     else:
         model_save = None
-    runner = Runner(model=model, data=ds, save_path=model_save)
+    runner = Runner(model=model, data=ds, save_path=model_save, batch_size=16)
     runner.run()

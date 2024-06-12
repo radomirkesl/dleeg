@@ -1,8 +1,12 @@
+from typing import Dict
+
 import pytorch_lightning as L
 import torch
 from torch import nn
 from torchmetrics import Accuracy
+from torchmetrics.classification import MulticlassConfusionMatrix
 
+from metrics import CLASS_NUM, build_classwise_metrics, build_general_metrics
 from optim import build_adam_RLROP
 
 
@@ -107,7 +111,12 @@ class CNNTransformer(L.LightningModule):
         )
 
         self.loss = nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task="multiclass", num_classes=num_classes)
+        self.general_metrics = build_general_metrics()
+        self.classwise_metrics = build_classwise_metrics()
+        self.cm = MulticlassConfusionMatrix(num_classes=CLASS_NUM, normalize="true")
+        self.saved_metrics: Dict
+
+        self.save_hyperparameters()
 
     def forward(self, x):
         x = self.conv1(x)
@@ -151,10 +160,13 @@ class CNNTransformer(L.LightningModule):
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        test_loss = self.loss(outputs, labels)
-        self.accuracy(outputs, labels)
-        self.log("test_acc", self.accuracy, on_step=False, on_epoch=True)
-        self.log("test_loss", test_loss)
+        inputs, labels = batch
+        outputs = self.forward(inputs)
+        metrics = self.general_metrics(outputs, labels)
+        self.log_dict(self.general_metrics, on_step=False, on_epoch=True)
+        self.saved_metrics = metrics
+        self.saved_metrics.update(self.classwise_metrics(outputs, labels))
+        self.saved_metrics["confusion_matrix"] = self.cm(outputs, labels)
 
 
 if __name__ == "__main__":
