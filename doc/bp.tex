@@ -35,25 +35,23 @@ This paper focuses on the application of neural networks on data from recordings
 
 In this chapter various concepts, important for the area are explained in the following order. First the prevalent ways of recording brain activity are discussed, secondly examples of tasks which use neural networks and these recordings are presented, after that the basic types of modern neural networks are shown and finally data availability is briefly considered.
 
-\section{Recording brain activity}
+% TODO: Change this to reflect what actually is here
 
-\subsection{Electroencephalography}
+\section{Electroencephalography}
 
-Electroencephalography (EEG) is probably the most used method of recording brain activity. It is conducted by planting electrodes on the scalp and making a record of the changing voltage (Berger~\cite{berger:eeg:29}, as cited by Luck~\cite{luck:erp:book}). This approach tends to be relatively convenient, as it can be easily recorded with a cap equipped with electrodes which is an asset usually not difficult to obtain nowadays.
-It does have disadvantages though, for example it generally has low spatial resolution and is prone to artefacts~\cite{berezutskaya:ieeg:22}. EEG does usually obtain signals from several neural sources which overlap and that in turn complicates isolating the desired information~\cite{luck:erp:book}. This is one of the problems which appears to call for a solution through neural networks.
+Electroencephalography (EEG) is possibly the most frequently used method of recording brain activity. It is conducted by planting electrodes on the scalp and making a record of the changing voltage (\cite{berger:eeg:29}, as cited by \cite{luck:erp:book}). This approach tends to be relatively convenient, as it can be easily recorded with a cap equipped with electrodes, which is an asset usually not too difficult to obtain nowadays.
 
-% Invasive techniques of recording the activity of the brain, while effective, have a significant disadvantage that the necessary implants tend to fail over time~\cite{barrese:invasive:fail:13}.
-% TODO: iEEG, fMRI, MEG
+One of the main advantages (along with the cost and convenience) of EEG is its great temporal resolution granted by the high speed of electric field propagation~\cite{roy:eeg:review:19}. On the other hand, the spatial resolution is often not great, which is caused by the tissues between the brain and the electrodes~\cite{roy:eeg:review:19, berezutskaya:ieeg:22}. A single electrode also obtains signals from several overlapping neural sources, leading to spatial correlation between the channels, making it difficult to isolate the desired information~\cite{roy:eeg:review:19, luck:erp:book}. In addition to that EEG also suffers noise from unrelated physiological signals, such as electromyogram from eye blinks~\cite{craik:dl:eeg:rev:19}.
 
-\section{Classification tasks}
+It is worth noting that EEG can also be recorded intracranially, possibly overcoming or at least reducing many of these issues. It is conducted by planting the electrodes directly on the brain tissue, which is obviously highly invasive and that tends to be a severe limitation, considering the risks and costs associated. There are, however, procedures that already involve the implantation process, such as localization of the source of epileptic seizures, or their treatment in durg-resistant patients~\cite{jobst:iEEG:20}. These provide a great opportunity to keep the records for other purposes as well~\cite{berezutskaya:ieeg:22}.
 
-\subsection{Brain-computer interface and motor imagery}
+\section{Brain-computer Interface and Motor Imagery}
 
 Using manual controls like buttons, joysticks or other physical movement is a serviceable but not very natural way of controlling assisting systems for the disabled~\cite{he:bci:legs:18}. This is only one of the areas, where brain-computer interface could be significantly beneficial~\cite{craik:dl:eeg:rev:19}.
 As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{data:stieger:21}.
 This is another obstacle, which might be best overcome by neural networks.
 
-Motor imagery tasks seem to be among the most practical in BCI applications. 
+Motor imagery tasks seem to be among the most practical in BCI applications.
 They rely on the subject imagining a movement of a part of their body without actually performing it~\cite{craik:dl:eeg:rev:19}.
 The BCI then attempts to discern the imagined motion and passes the information to a connected system (assistant device, computer, \dots).
 
@@ -63,21 +61,18 @@ It also means that we have a better idea of what to look for in the patterns of 
 
 Another advantage is that motor imagery simulates natural ways in which humans control their movement.	For example, imagining walking could be used to control assistant devices, like a wheelchair (which is a lot more natural than a using a joystick or buttons), or a prosthetic leg. Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help recover their ability to control the said limb (rehabilitative devices). Alternatively, imagining hand movement could be used to move the mouse cursor on a PC, which might be useful for anyone, but especially those suffering from any arm or hand related disabilities.
 
-% TODO: emotion recognition, mental workload, seizure detection, sleep stage scoring, ERP
 
-\section{Neural network types}
-
-% TODO: CNN, LSTM, Transformer
-
-\section{Convolutional neural network}
-
-\section{Data availability}
+\section{Data Availability}
 
 The lack of large, extensive datasets tends to be a problem while attempting to use neural networks on brain activity recordings. This is because complex classifiers, such as neural networks, while extremely precise with large amounts of data, tend to overfit easily in the case of insufficient data~\cite{domingos:ml:12}. This shortage seems to be mostly caused by the complexity of required experiments and the lack of appropriate subjects~\cite{he:da:21}. However, some studies that emerged recently appear reasonably extensive even for the use with these techniques.
 
 Data augmentation (DA) --- a method of dealing with overfitting via generating additional data based on existing data --- tends to be a valuable tool in NN processing of brain activity recordings, because of the lack of complex datasets described earlier~\cite{he:da:21}. It carries some potential risks, such as reduced performance, but it usually succeeds in increasing accuracy of neural networks~[\emph{ibid.}].
 
-% TODO: maybe examples of DA?
+\section{Deep Learning Classification}
+
+% TODO: CNN, LSTM, Transformer
+
+\subsection{Convolutional Neural Network}
 
 \chapter{State-of-the-art}
 
@@ -91,43 +86,43 @@ The most of the comparison can be seen in table \ref{tab:datasets}. Note that tr
 Based on our findings, the Stieger-62 dataset was chosen. The main reason is its size, which beats all the listed competition (and likely most of the unlisted as well) and while the Dreyer-87 dataset has a greater number of participants, the amount of trials and recording time in Stieger-62 is far superior, and we consider it more important. This dataset also fulfils all other requirements (validation, accessibility, \dots) and has a reasonable amount of citations. For those reasons it will be examined more closely and likely chosen for our experiments. If new issues appear about it, the Dreyer-87 dataset will be considered.
 
 \begin{table}
-\centering
-\begin{tabular}{@{}p{0.15\textwidth}p{0.6\textwidth}p{0.15\textwidth}@{}}
-\toprule
-\textbf{Alias} & \textbf{Article name} & \textbf{Citation} \\
-\midrule
-Dreyer-87 & A large EEG database with users’ profile information for motor imagery brain-computer interface research & \cite{data:dreyer:23} \\
-Ma-25 & A large EEG dataset for studying cross-session variability in motor imagery brain-computer interface & \cite{data:ma:22} \\
-Peterson-10 & A motor imagery vs. rest dataset with low-cost consumer grade EEG hardware & \cite{data:peterson:22} \\
- Stieger-62 & Continuous sensorimotor rhythm based brain computer interface learning
- in a large population & \cite{data:stieger:21} \\
-\bottomrule
-\end{tabular}
-\caption{Aliases of compared datasets.}
-\label{tab:aliases}
+	\centering
+	\begin{tabular}{@{}p{0.15\textwidth}p{0.6\textwidth}p{0.15\textwidth}@{}}
+		\toprule
+		\textbf{Alias}        & \textbf{Article name}                                                                                    & \textbf{Citation}       \\
+		\midrule
+		Dreyer-87             & A large EEG database with users’ profile information for motor imagery brain-computer interface research & \cite{data:dreyer:23}   \\
+		Ma-25                 & A large EEG dataset for studying cross-session variability in motor imagery brain-computer interface     & \cite{data:ma:22}       \\
+		Peterson-10           & A motor imagery vs. rest dataset with low-cost consumer grade EEG hardware                               & \cite{data:peterson:22} \\
+		Stieger-62            & Continuous sensorimotor rhythm based brain computer interface learning
+		in a large population & \cite{data:stieger:21}                                                                                                             \\
+		\bottomrule
+	\end{tabular}
+	\caption{Aliases of compared datasets.}
+	\label{tab:aliases}
 \end{table}
 
 \begin{table}
-\centering
-\resizebox{\textwidth}{!}{
-    \begin{tabular}{@{}*{9}{l}@{}}
-\toprule
-\textbf{Dataset} & \textbf{Participants} & \textbf{Trials} & \textbf{Recording time} & \textbf{Citations} & \textbf{Metadata} & \textbf{Validation} & \textbf{Availability} & \textbf{Licence} \\
-\midrule
-Dreyer-87 & 87 & 20800 & 70 hours & 0 & Extensive & Present & Open Access & CC BY 4.0 \\
-Ma-25 & 25 & 12500 & 26 hours & 6 & Insufficient & Present & Open Access & CC BY 4.0 \\
-Peterson-10 & 10 & 1650 & 15 hours & 1 & Sufficient & Missing & Open Access & CC0 \\
-Stieger-62 & 62 & 250000 & 600 hours & 15 & Extensive & Present & Open Access & CC BY 4.0 \\
-\bottomrule
-\end{tabular}
-}
-\caption{Comparison of recent datasets.}
-\label{tab:datasets}
+	\centering
+	\resizebox{\textwidth}{!}{
+		\begin{tabular}{@{}*{9}{l}@{}}
+			\toprule
+			\textbf{Dataset} & \textbf{Participants} & \textbf{Trials} & \textbf{Recording time} & \textbf{Citations} & \textbf{Metadata} & \textbf{Validation} & \textbf{Availability} & \textbf{Licence} \\
+			\midrule
+			Dreyer-87        & 87                    & 20800           & 70 hours                & 0                  & Extensive         & Present             & Open Access           & CC BY 4.0        \\
+			Ma-25            & 25                    & 12500           & 26 hours                & 6                  & Insufficient      & Present             & Open Access           & CC BY 4.0        \\
+			Peterson-10      & 10                    & 1650            & 15 hours                & 1                  & Sufficient        & Missing             & Open Access           & CC0              \\
+			Stieger-62       & 62                    & 250000          & 600 hours               & 15                 & Extensive         & Present             & Open Access           & CC BY 4.0        \\
+			\bottomrule
+		\end{tabular}
+	}
+	\caption{Comparison of recent datasets.}
+	\label{tab:datasets}
 \end{table}
 
 % TODO: Review and edit
 
-\subsection{Stieger-62 dataset}
+\subsection{Stieger-62 Dataset}
 
 The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by Stieger et al.~\cite{data:stieger:21} appears to be among the best in class with more than 250000 trials from 62 subjects, collected over 7--11 sessions.
 The task in these experiments was moving a cursor via imagining hand movement. The subject was supposed to imagine opening and closing their left or right hand to move the cursor in the respective direction, opening and closing both hands at once to move the cursor up and clearing their mind to move the cursor down. Third of the trials was limited to up-down movement, third to left-right movement and the rest in both dimensions.
@@ -151,7 +146,7 @@ This appears to be the only extensive study, conducted on the data of interest s
 
 Ideas for future research in the application of neural networks on brain activity data are proposed in this chapter. Some of these will be selected for the final application. Firs new approaches on using specific data for training NNs in BCIs are suggested, then a more effective approach to storing data for experiments is discussed.
 
-\section{Learning on data from trained users}
+\section{Learning on Data from Trained Users}
 
 According to Stieger et al.~\cite{data:stieger:21,stieger:mindfulness:20} users can improve in BCI proficiency via training. The question is: Could learning on recordings from these advanced users produce better classifiers than simply using all the available data? And would these be effective for any user or only those of comparable abilities?
 
@@ -159,13 +154,13 @@ This issue appears to be worth investigating via experimentation and the Med-62 
 
 Additionally, similar experiments could be performed with focus on users who received training in meditation instead of or in addition to using the later sessions.
 
-\section{Metadata specific training}
+\section{Metadata Specific Training}
 
 Another approach that could be attempted is trying to find a classifier which would best work for a specific group of subjects based on a shared quality, such as gender, age and task-specific subject traits (such as dominant hand in the case of motor imagery). This could be done by training an entire subject-specific classifier which in case of long term used systems, such as BCI-operated assistant devices, would probably still be worth the extra work, or by pre-training a general classifier and then adding specializations for each user.
 
 This approach seems to require a large amount of data equipped with profound metadata and once again, the Med-62 dataset~\cite{data:stieger:21} appears appropriate for that. In addition, as using subsets of datasets reduces the volume of the data significantly, data augmentation would likely be a worthwhile tool for these methods.
 
-\section{Unified and efficient approach to data}
+\section{Unified and Efficient Approach to Data}
 
 Speaking from a completely different perspective, it does seem that this area of research could benefit from a more unified approach to some procedures, such as data recording and especially storage. A system where the data is in a single binary file could be designed. All the metadata could be in an external database or a similar system which would provide very fast access to any subset of the dataset, based on the metadata --- basically via simple queries.
 
