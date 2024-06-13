@@ -3,10 +3,8 @@ from typing import Dict
 import pytorch_lightning as L
 import torch
 from torch import nn
-from torchmetrics import Accuracy
-from torchmetrics.classification import MulticlassConfusionMatrix
 
-from metrics import CLASS_NUM, build_classwise_metrics, build_general_metrics
+from metrics import build_general_metrics
 from optim import build_adam_RLROP
 
 
@@ -42,10 +40,12 @@ class CNNTransformer(L.LightningModule):
         num_classes=4,
         conv_depth=2,
         dropout_rate=0.5,
-        transformer_heads=4,
-        transformer_layers=4,
+        transformer_heads=2,
+        transformer_layers=2,
+        rlrop_use_train_loss=False,
     ):
         super().__init__()
+        self.rl_tl = rlrop_use_train_loss
         conv1_out = conv_depth * conv1_filters
         self.conv1 = nn.Sequential(
             nn.Conv1d(
@@ -111,9 +111,7 @@ class CNNTransformer(L.LightningModule):
         )
 
         self.loss = nn.CrossEntropyLoss()
-        self.general_metrics = build_general_metrics()
-        self.classwise_metrics = build_classwise_metrics()
-        self.cm = MulticlassConfusionMatrix(num_classes=CLASS_NUM, normalize="true")
+        self.metrics = build_general_metrics()
         self.saved_metrics: Dict
 
         self.save_hyperparameters()
@@ -143,12 +141,13 @@ class CNNTransformer(L.LightningModule):
         return x.numel()
 
     def configure_optimizers(self):
-        return build_adam_RLROP(self.parameters())
+        return build_adam_RLROP(self.parameters(), use_train_loss=self.rl_tl)
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
         loss = self.loss(outputs, labels)
+        self.log("train_loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -160,13 +159,8 @@ class CNNTransformer(L.LightningModule):
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        inputs, labels = batch
-        outputs = self.forward(inputs)
-        metrics = self.general_metrics(outputs, labels)
-        self.log_dict(self.general_metrics, on_step=False, on_epoch=True)
-        self.saved_metrics = metrics
-        self.saved_metrics.update(self.classwise_metrics(outputs, labels))
-        self.saved_metrics["confusion_matrix"] = self.cm(outputs, labels)
+        self.saved_metrics = self.metrics(outputs, labels)
+        self.log_dict(self.metrics, on_step=False, on_epoch=True)
 
 
 if __name__ == "__main__":

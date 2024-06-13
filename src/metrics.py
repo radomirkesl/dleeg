@@ -35,7 +35,7 @@ def build_general_metrics() -> MetricCollection:
     )
 
 
-def build_classwise_metrics() -> MetricCollection:
+def _build_classwise_metrics() -> MetricCollection:
     return MetricCollection(
         {
             "accuracy_classwise": MulticlassAccuracy(

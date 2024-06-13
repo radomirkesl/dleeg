@@ -3,9 +3,8 @@ from typing import Dict
 import pytorch_lightning as L
 import torch
 from torch import nn
-from torchmetrics.classification import MulticlassConfusionMatrix
 
-from metrics import CLASS_NUM, build_classwise_metrics, build_general_metrics
+from metrics import build_general_metrics
 from optim import build_adam_RLROP
 
 
@@ -13,7 +12,7 @@ class CNN_LSTM(L.LightningModule):
 
     def __init__(
         self,
-        in_channels,
+        data_shape,
         conv1_kernel=64,
         conv2_kernel=16,
         conv1_filters=8,
@@ -23,13 +22,15 @@ class CNN_LSTM(L.LightningModule):
         conv_depth=2,
         dropout_rate=0.5,
         hidden_size=128,
-        lstm_layers=3,
+        lstm_layers=2,
+        rlrop_use_train_loss=False,
     ):
         super().__init__()
+        self.rl_tl = rlrop_use_train_loss
         conv1_out = conv_depth * conv1_filters
         self.conv1 = nn.Sequential(
             nn.Conv1d(
-                in_channels=in_channels,
+                in_channels=data_shape[0],
                 kernel_size=conv1_kernel,
                 out_channels=conv1_filters,
                 padding="same",
@@ -79,9 +80,7 @@ class CNN_LSTM(L.LightningModule):
         )
         self.loss = nn.CrossEntropyLoss()
 
-        self.general_metrics = build_general_metrics()
-        self.classwise_metrics = build_classwise_metrics()
-        self.cm = MulticlassConfusionMatrix(num_classes=CLASS_NUM, normalize="true")
+        self.metrics = build_general_metrics()
         self.saved_metrics: Dict
 
         self.save_hyperparameters()
@@ -97,12 +96,13 @@ class CNN_LSTM(L.LightningModule):
         return x
 
     def configure_optimizers(self):
-        return build_adam_RLROP(self.parameters())
+        return build_adam_RLROP(self.parameters(), use_train_loss=self.rl_tl)
 
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
         loss = self.loss(outputs, labels)
+        self.log("train_loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -114,11 +114,8 @@ class CNN_LSTM(L.LightningModule):
     def test_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        metrics = self.general_metrics(outputs, labels)
-        self.log_dict(self.general_metrics, on_step=False, on_epoch=True)
-        self.saved_metrics = metrics
-        self.saved_metrics.update(self.classwise_metrics(outputs, labels))
-        self.saved_metrics["confusion_matrix"] = self.cm(outputs, labels)
+        self.saved_metrics = self.metrics(outputs, labels)
+        self.log_dict(self.metrics, on_step=False, on_epoch=True)
 
 
 if __name__ == "__main__":
@@ -129,7 +126,7 @@ if __name__ == "__main__":
     from run import Runner
 
     ds: TensorDataset = torch.load(argv[1])
-    model = CNN_LSTM(in_channels=ds[0][0].shape[0], lstm_layers=1)
+    model = CNN_LSTM(data_shape=ds[0][0], lstm_layers=1)
     if len(argv) > 2:
         model_save = argv[2]
     else:

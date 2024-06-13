@@ -11,10 +11,15 @@ def build_adam_RLROP(
     factor: float = 0.1,
     patience: int = 5,
     cooldown: int = 2,
+    use_train_loss: bool = False,
 ) -> Tuple[List[Optimizer], List[Dict[str, object]]]:
     optimizer = Adam(parameters, lr=initial_learning_rate)
 
     # Define ReduceLROnPlateau scheduler
+    if use_train_loss:
+        monitor = "train_loss"
+    else:
+        monitor = "val_loss"
     scheduler = {
         "scheduler": ReduceLROnPlateau(
             optimizer,
@@ -24,7 +29,7 @@ def build_adam_RLROP(
             cooldown=cooldown,
         ),
         # Metric to monitor
-        "monitor": "val_loss",
+        "monitor": monitor,
         # Check interval: 'epoch' or 'step'
         "interval": "epoch",
         # Check learning rate every n epochs

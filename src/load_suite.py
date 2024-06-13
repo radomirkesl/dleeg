@@ -17,9 +17,6 @@ class LoadSuite:
 
     def load_and_process(self, experiment_name: str, subject_spec: SubjectSpec):
         loader = Loader(subject_spec=subject_spec)
-        print("------------------------------------")
-        print(f"Loading data for {experiment_name}")
-        print("------------------------------------")
         experiment_output = self.outputs_dir / experiment_name
         experiment_output.mkdir(exist_ok=True)
         data_path = experiment_output / "data.ds"
@@ -28,6 +25,9 @@ class LoadSuite:
                 f"Data already exists for {experiment_name}, skipping. Use LoadSuite(overwrite=True) to overwrite."
             )
             return
+        print("------------------------------------")
+        print(f"Loading data for {experiment_name}")
+        print("------------------------------------")
         tick = time()
         try:
             ds, stats = loader.load_dir(self.inputs_dir)

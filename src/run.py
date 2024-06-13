@@ -1,8 +1,10 @@
 from datetime import timedelta
+from pathlib import Path
 from time import time
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Type
 
 import pytorch_lightning as L
+import torch
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.lr_monitor import LearningRateMonitor
 from sklearn.model_selection import KFold
@@ -74,9 +76,9 @@ class Runner:
 class KFoldRunner:
     def __init__(
         self,
-        model: L.LightningModule,
+        model_type: Type[L.LightningModule],
         data: TensorDataset,
-        save_path: Optional[str] = None,
+        save_path: Optional[Path] = None,
         workers: int = 11,
         batch_size: int = 64,
         pin_memory: bool = True,
@@ -84,74 +86,105 @@ class KFoldRunner:
         max_epochs: int = 100,
         patience: int = 10,
         num_folds: int = 5,
-        set_split: Tuple[float, float] = (0.8, 0.2),
+        **kwargs,
     ) -> None:
 
         L.seed_everything(seed=seed, workers=True)
 
-        self.model: L.LightningModule = model
-        self.save_path: Optional[str] = save_path
-        self.workers: int = workers
-        self.batch_size: int = batch_size
-        self.pin_memory: bool = pin_memory
-        self.max_epochs: int = max_epochs
-        self.patience: int = patience
+        self._model_type: Type[L.LightningModule] = model_type
+        self._data: TensorDataset = data
+        self._save_path: Optional[Path] = save_path
+        self._workers: int = workers
+        self._batch_size: int = batch_size
+        self._pin_memory: bool = pin_memory
+        self._max_epochs: int = max_epochs
+        self._patience: int = patience
+        self._num_folds: int = num_folds
+        self._model_params = kwargs
 
-        self.train_data, test_data = random_split(data, set_split)
         kfold = KFold(n_splits=num_folds, shuffle=True)
-        self.folds = list(kfold.split(self.train_data))
-        self.test = DataLoader(
-            test_data,
-            num_workers=workers,
-            batch_size=batch_size,
-            shuffle=False,
-            persistent_workers=True,
-            pin_memory=pin_memory,
-        )
-        # checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode="min")
-        self.trainer = L.Trainer(
-            max_epochs=self.max_epochs,
-            callbacks=[
-                EarlyStopping(monitor="val_loss", patience=self.patience, mode="min"),
-                LearningRateMonitor(logging_interval="epoch"),
-                # checkpoint_callback,
-            ],
-        )
+        self._folds = list(kfold.split(self._data))
+        self._metrics: List[Dict] = []
 
     def run(self):
         tick = time()
-        for fold, (train_idx, val_idx) in enumerate(self.folds):
+        for fold, (train_idx, val_idx) in enumerate(self._folds):
             print(f"FOLD {fold}")
             print("--------------------------------")
 
-            train_subset = Subset(self.train_data, train_idx)
-            val_subset = Subset(self.train_data, val_idx)
+            train_subset = Subset(self._data, train_idx)
+            val_subset = Subset(self._data, val_idx)
 
             train_loader = DataLoader(
                 train_subset,
-                num_workers=self.workers,
-                batch_size=self.batch_size,
+                num_workers=self._workers,
+                batch_size=self._batch_size,
                 shuffle=True,
                 persistent_workers=True,
-                pin_memory=self.pin_memory,
+                pin_memory=self._pin_memory,
             )
             val_loader = DataLoader(
                 val_subset,
-                num_workers=self.workers,
-                batch_size=self.batch_size,
+                num_workers=self._workers,
+                batch_size=self._batch_size,
                 shuffle=False,
                 persistent_workers=True,
-                pin_memory=self.pin_memory,
+                pin_memory=self._pin_memory,
             )
+            model = self._model_type(**self._model_params)
+            trainer = L.Trainer(
+                    max_epochs=self._max_epochs,
+                    callbacks=[
+                        EarlyStopping(monitor="val_loss", patience=self._patience, mode="min"),
+                        LearningRateMonitor(logging_interval="epoch"),
+                        ],
+                    )
 
-            self.trainer.fit(
-                self.model,
+            trainer.fit(
+                model,
                 train_dataloaders=train_loader,
                 val_dataloaders=val_loader,
             )
+            trainer.test(model, val_loader)
+            self._metrics.append(model.saved_metrics)
 
-        self.trainer.test(self.model, self.test)
-        if self.save_path:
-            self.trainer.save_checkpoint(self.save_path)
+        print("FULL SET TRAINING")
+        print("--------------------------------")
+        full_loader = DataLoader(
+            self._data,
+            num_workers=self._workers,
+            batch_size=self._batch_size,
+            shuffle=True,
+            persistent_workers=True,
+            pin_memory=self._pin_memory,
+        )
+        model = self._model_type(**self._model_params, rlrop_use_train_loss=True)
+        trainer = L.Trainer(
+                max_epochs=self._max_epochs,
+                callbacks=[
+                    EarlyStopping(monitor="train_loss", patience=self._patience, mode="min"),
+                    LearningRateMonitor(logging_interval="epoch"),
+                    ],
+                )
+
+        trainer.fit(
+            model,
+            train_dataloaders=full_loader,
+        )
+
+        if self._save_path:
+            trainer.save_checkpoint(self._save_path)
         tock = time()
         print(f"Elapsed time: {timedelta(seconds=tock - tick)}")
+
+    def get_aggregated_metrics(self) -> Dict[str, Dict[str, float]]:
+        metrics = {}
+        for m in self._metrics:
+            for k, v in m.items():
+                if k not in metrics:
+                    metrics[k] = []
+                metrics[k].append(v)
+        metrics = {k: torch.std_mean(torch.tensor(v), dim=0) for k, v in metrics.items()}
+        return {k: {"mean": v[1].item(), "std": v[0].item()} for k, v in metrics.items()}
+
+
