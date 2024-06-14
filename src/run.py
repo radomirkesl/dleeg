@@ -84,7 +84,7 @@ class KFoldRunner:
         pin_memory: bool = True,
         seed: int = 42,
         max_epochs: int = 100,
-        patience: int = 10,
+        patience: int = 15,
         num_folds: int = 5,
         **kwargs,
     ) -> None:
