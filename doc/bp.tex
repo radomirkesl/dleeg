@@ -39,17 +39,30 @@ In this chapter various concepts, important for the area are explained in the fo
 
 \section{Electroencephalography}
 
-Electroencephalography (EEG) is possibly the most frequently used method of recording brain activity. It is conducted by planting electrodes on the scalp and making a record of the changing voltage (\cite{berger:eeg:29}, as cited by \cite{luck:erp:book}). This approach tends to be relatively convenient, as it can be easily recorded with a cap equipped with electrodes, which is an asset usually not too difficult to obtain nowadays.
+Electroencephalography (EEG) is possibly the most frequently used method of recording brain activity. It is conducted by planting electrodes on the scalp and making a record of the changing voltage (\cite{berger:eeg:29}, as cited by \cite{luck:erp:book}). This approach tends to be relatively convenient, as the required assets are not too costly, can be applied and removed non-invasively and even allow for user mobility~\cite{padfield:bci:19}.
 
 One of the main advantages (along with the cost and convenience) of EEG is its great temporal resolution granted by the high speed of electric field propagation~\cite{roy:eeg:review:19}. On the other hand, the spatial resolution is often not great, which is caused by the tissues between the brain and the electrodes~\cite{roy:eeg:review:19, berezutskaya:ieeg:22}. A single electrode also obtains signals from several overlapping neural sources, leading to spatial correlation between the channels, making it difficult to isolate the desired information~\cite{roy:eeg:review:19, luck:erp:book}. In addition to that EEG also suffers noise from unrelated physiological signals, such as electromyogram from eye blinks~\cite{craik:dl:eeg:rev:19}.
 
-It is worth noting that EEG can also be recorded intracranially, possibly overcoming or at least reducing many of these issues. It is conducted by planting the electrodes directly on the brain tissue, which is obviously highly invasive and that tends to be a severe limitation, considering the risks and costs associated. There are, however, procedures that already involve the implantation process, such as localization of the source of epileptic seizures, or their treatment in durg-resistant patients~\cite{jobst:iEEG:20}. These provide a great opportunity to keep the records for other purposes as well~\cite{berezutskaya:ieeg:22}.
+It is worth noting that EEG can also be recorded intracranially (iEEG), possibly overcoming or at least reducing many of these issues. It is conducted by planting the electrodes directly on the brain tissue, which is obviously highly invasive and that tends to be a severe limitation, considering the risks and costs associated. There are, however, procedures that already involve the implantation process, such as localization of the source of epileptic seizures, or their treatment in durg-resistant patients~\cite{jobst:iEEG:20}. These provide a great opportunity to keep the records for other purposes as well~\cite{berezutskaya:ieeg:22}.
 
-\section{Brain-computer Interface and Motor Imagery}
+Lastly, one more disadvantage of EEG is high inter-subject variability caused by different physiology of subjects~\cite{roy:eeg:review:19}. This especially affects classification tasks that try to generalize over a large population. Intra-subject approach bypasses this problem, but introduces a new one --- the need for a large amount of data from each subject to train a unique classifier for them.
+
+It appears that deep learning (DL) can be impactful in overcoming these limitations~\cite{roy:eeg:review:19}.
+
+\section{Brain-computer Interface}
 
 Using manual controls like buttons, joysticks or other physical movement is a serviceable but not very natural way of controlling assisting systems for the disabled~\cite{he:bci:legs:18}. This is only one of the areas, where brain-computer interface could be significantly beneficial~\cite{craik:dl:eeg:rev:19}.
-As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{data:stieger:21}.
-This is another obstacle, which might be best overcome by neural networks.
+
+As the name suggests, brain-computer interface (BCI), also referred to as brain-machine interface (BMI), could be defined as a system which allows direct communication between the human brain and a machine. However, controlling a BCI is typically challenging and requires extensive training, which still might be insufficient for some users~\cite{data:stieger:21}. The application of deep learning could help improve usability for users of varying proficiencies, making it easier to use for beginners and more precise for advanced users.
+
+BCI technologies have a promising potential in various fields, such as prosthetics, rehabilitation and even entertainment.
+In robotic prosthetics, BCIs could serve as an alternative to concurrent input methods, such as myoelectrics, which rely on relatively expensive technologies and are negatively affected by damage to the central nervous system~\cite{padfield:bci:19}. This also applies to wheelchair control and, in a sense, the control of a computer's cursor can fall in this category as well by providing even a seriously paralysed patient with numerous ways of interacting with the world.
+In rehabilitation, robotic arms, exoskeletons and similar devices are often used to perform movements with the subjects' limbs in hopes of restoring the ability to do so on their own. In this practice, it is crucial for the subject to be imagining a movement of the limb and the device moving that limb in the imagined way. To achieve this, it is necessary to decode the imagination correctly, see section \ref{sec:mi}.
+Another medical use of BCIs is affective computing, which is based on monitoring the subjects psychological state~\cite{padfield:bci:19}. This is a more passive approach, but the information is then used to for example adjust the subject's environment, so it can still be considered a BCI.
+Finally, BCIs could be potentially used commercially in entertainment, for example gaming~\cite{padfield:bci:19}.
+
+\section{Motor Imagery}
+\label{sec:mi}
 
 Motor imagery tasks seem to be among the most practical in BCI applications.
 They rely on the subject imagining a movement of a part of their body without actually performing it~\cite{craik:dl:eeg:rev:19}.
@@ -59,7 +72,7 @@ One of the main advantages of this approach is that motor imagery (imagining a m
 That essentially means that we can record brain activity of subjects performing the movement and later compare it to the recordings from subjects imagining the movement to achieve better certainty that the data is valuable. If the data from motor imagery is nowhere near the data from performing movement, we can assume it is flawed (distracted subject, failed recording device, \dots) and exclude it from the final dataset.
 It also means that we have a better idea of what to look for in the patterns of brain activity and that we could potentially feed this information to neural networks --- learn them on data from performing movements instead of (or as well as) imagining them.
 
-Another advantage is that motor imagery simulates natural ways in which humans control their movement.	For example, imagining walking could be used to control assistant devices, like a wheelchair (which is a lot more natural than a using a joystick or buttons), or a prosthetic leg. Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help recover their ability to control the said limb (rehabilitative devices). Alternatively, imagining hand movement could be used to move the mouse cursor on a PC, which might be useful for anyone, but especially those suffering from any arm or hand related disabilities.
+Another advantage is that motor imagery simulates natural ways in which humans control their movement. For example, imagining walking could be used to control assistant devices, like a wheelchair (which is a lot more natural than a using a joystick or buttons), or a prosthetic leg. Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help recover their ability to control the said limb (rehabilitative devices). Alternatively, imagining hand movement could be used to move the mouse cursor on a PC, which might be useful for anyone, but especially those suffering from any arm or hand related disabilities.
 
 
 \section{Data Availability}

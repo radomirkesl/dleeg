@@ -22,7 +22,7 @@ class CNN_LSTM(L.LightningModule):
         conv_depth=2,
         dropout_rate=0.5,
         hidden_size=128,
-        lstm_layers=2,
+        lstm_layers=3,
         rlrop_use_train_loss=False,
     ):
         super().__init__()
