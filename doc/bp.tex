@@ -50,6 +50,7 @@ Lastly, one more disadvantage of EEG is high inter-subject variability caused by
 It appears that deep learning (DL) can be impactful in overcoming these limitations~\cite{roy:eeg:review:19}.
 
 \section{Brain-computer Interface}
+\label{sec:bci}
 
 Using manual controls like buttons, joysticks or other physical movement is a serviceable but not very natural way of controlling assisting systems for the disabled~\cite{he:bci:legs:18}. This is only one of the areas, where brain-computer interface could be significantly beneficial~\cite{craik:dl:eeg:rev:19}.
 
@@ -72,7 +73,7 @@ One of the main advantages of this approach is that motor imagery (imagining a m
 That essentially means that we can record brain activity of subjects performing the movement and later compare it to the recordings from subjects imagining the movement to achieve better certainty that the data is valuable. If the data from motor imagery is nowhere near the data from performing movement, we can assume it is flawed (distracted subject, failed recording device, \dots) and exclude it from the final dataset.
 It also means that we have a better idea of what to look for in the patterns of brain activity and that we could potentially feed this information to neural networks --- learn them on data from performing movements instead of (or as well as) imagining them.
 
-Another advantage is that motor imagery simulates natural ways in which humans control their movement. For example, imagining walking could be used to control assistant devices, like a wheelchair (which is a lot more natural than a using a joystick or buttons), or a prosthetic leg. Similarly, imagining a movement of muscles in a limb could instruct an exoskeletal device to move this limb in the imagined way, which observed by the subject may help recover their ability to control the said limb (rehabilitative devices). Alternatively, imagining hand movement could be used to move the mouse cursor on a PC, which might be useful for anyone, but especially those suffering from any arm or hand related disabilities.
+An advantage of motor imagery is that it simulates natural ways in which humans control their movement. For example, imagining walking could be used to control assistant devices, like a wheelchair or a prosthetic leg, which would be a lot more natural than buttons and joysticks. In addition, motor imagery can be exceptionally useful in rehabilitation, as discussed in section \ref{sec:bci}.
 
 
 \section{Data Availability}
@@ -89,14 +90,14 @@ Data augmentation (DA) --- a method of dealing with overfitting via generating a
 
 \chapter{State-of-the-art}
 
-In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First new open datasets of promising extensiveness are discussed and then examples of modern deep learning systems are shown.
+In the following chapter, some state-of-the-art research is presented and evaluated for the purposes of further examination. First new datasets of promising extensiveness are discussed and then examples of the application of modern deep learning systems on EEG data are shown.
 
 \section{Datasets}
 
 In this section, recent datasets are discussed in order to pick a good option for further experimenting. Each dataset has been assigned an alias (for convenience), as per table \ref{tab:aliases}. The examined sets have been recorded in table \ref{tab:datasets} and compared on metrics, such as size (amount of participants, trials and total recording time), metadata quality and availability. Further in this section a dataset is chosen and explained in detail. Note that this section is by no means meant to be a full review of the state-of-the-art datasets. It is a limited comparison with a goal of selecting a good set for our use. That means reasonably extensive, validated, equipped with metadata, accessible, and optimally already researched to an extent (other studies exist and can be used for comparison, but there is still space for further research).
 
-The most of the comparison can be seen in table \ref{tab:datasets}. Note that trials and recording time are usually an approximation made by us or directly the authors of the dataset. The 'Citations' column contains the amount of times the data paper was cited on Web of Science at the time of writing this. The 'Metadata' column shows the quality of the metadata, attached to the dataset, where 'Sufficient' means at least gender, age and laterality; 'Insufficient' means anything less than that; and 'Extensive' means substantially more than that.
-Based on our findings, the Stieger-62 dataset was chosen. The main reason is its size, which beats all the listed competition (and likely most of the unlisted as well) and while the Dreyer-87 dataset has a greater number of participants, the amount of trials and recording time in Stieger-62 is far superior, and we consider it more important. This dataset also fulfils all other requirements (validation, accessibility, \dots) and has a reasonable amount of citations. For those reasons it will be examined more closely and likely chosen for our experiments. If new issues appear about it, the Dreyer-87 dataset will be considered.
+The most of the comparison can be seen in table \ref{tab:datasets}. Note that trials and recording time are usually an approximation made by us or directly the authors of the dataset. The 'Citations' column contains the amount of times the data paper was cited according to Web of Science at the time of writing this. The 'Metadata' column shows the quality of the metadata, attached to the dataset, where 'Sufficient' means at least gender, age and laterality; 'Insufficient' means anything less than that; and 'Extensive' means substantially more than that.
+Based on our findings, the Stieger-62 dataset was chosen for further experimentation. The main reason is its size, which beats all the listed competition (and likely most of the unlisted as well) and while the Dreyer-87 dataset has a greater number of participants, the amount of trials and recording time in Stieger-62 is far superior, and we consider that more important. This dataset also fulfils all other requirements (validation, accessibility, \dots) and has a reasonable amount of citations. For those reasons it will be examined more closely and likely chosen for our experiments. If new issues appear about it, the Dreyer-87 dataset will be considered.
 
 \begin{table}
 	\centering
@@ -146,14 +147,18 @@ Some subjects also received training in mindfulness and meditation, as examinati
 This, together with other metadata which is provided in great measure for the dataset, could be used to conduct various experiments in order to improve accuracy of the BCI using neural networks.
 In this study a BCI was already used (online) to allow the users to control the cursor and thus be able to include the subjects' response to the visual feedback in the data. Nevertheless, a more classical approach to discern the subjects' intention was implemented, one based on actual neurophysiological knowledge of the expected EEG signal. Therefore, it seems natural to attempt to use a DL based method and compare the outcomes.
 
+% TODO: What exactly were they using?
+
+\section{Deep Learning on EEG Studies}
+
+% TODO: Title this and edit to fit here better but still relate to the DS
+
 Recently, an extensive study has been conducted on the presented dataset by Zhu et al.~\cite{zhu:dl:bci:mi:22}, comparing state-of-the-art DL systems, conducting a within-subject analysis, as well as a cross-subject analysis. Only a limited subset of the Stieger-62 dataset was used by the authors in order to allow comparability to another dataset. Specifically, only one of three tasks was used --- moving the cursor from left to right, up-down movement and 2D movement were omitted. Additionally, only the first three sessions were used.
-The following algorithms were used: EEGNet (CNN), Deep and Shallow ConvNet, Multi-Branch 3D CNN (CNN with 3D tensor input, arranged by spatial position on the scalp) and ParaAtt (Parallel Self-Attention Network). In the within-subject analysis, a model was built for each subject, using recordings from the first two sessions for training (20\% of that for validation) and data from the third session for testing. All the algorithms have outperformed the classical BCI used for online evaluation in the within-subject analysis. However, only EEGNet surpassed the online evaluation in a statistically significant way, achieving accuracy of $75.47 \pm 10.8\%$, while online achieved $68.10 \pm 12.6\%$.\@
+The following algorithms were used: EEGNet (CNN), Deep and Shallow ConvNet, Multi-Branch 3D CNN (CNN with 3D tensor input, arranged by spatial position on the scalp) and ParaAtt (Parallel Self-Attention Network). In the within-subject analysis, a model was built for each subject, using recordings from the first two sessions for training (20\% of that for validation) and data from the third session for testing. All the algorithms have outperformed the classical BCI
+% TODO: what now?
+used for online evaluation in the within-subject analysis. However, only EEGNet surpassed the online evaluation in a statistically significant way, achieving accuracy of $75.47 \pm 10.8\%$, while online achieved $68.10 \pm 12.6\%$.\@
 For the cross-subject analysis, a model was also built for each subject, only this time using the first three sessions from that one subject as the test set  and the first three sessions of the remaining subjects as the training set (again, 20\% for validation). According to the authors of the study, EEGNet performed the best again (better than all the other models in a statistically significant way), but they do not provide the specific numbers.
-This appears to be the only extensive study, conducted on the data of interest so far (and reasonably accessible to us), which leaves a decent amount of space for further studies while providing a possibility of comparison.
-
-\section{Algorithms}
-
-% TODO: CNN + LSTM, ...
+This appears to be the only extensive study, conducted on the Stieger-62 dataset so far (and reasonably accessible to us), which leaves a decent amount of space for further studies while providing a possibility of comparison.
 
 \chapter{Analysis}
 
