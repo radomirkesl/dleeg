@@ -257,6 +257,8 @@ class Loader:
         domain: LoadDomain = LoadDomain(task=None, time_frame=(2000, 6000), channels=C_CHANNELS),
         subject_spec: Optional[SubjectSpec] = None,
         ptp_thresh: Optional[int] = 130,
+        subject_nums: Optional[List[int]] = None,
+        session_nums: Optional[List[int]] = None,
         verbose: bool = False,
         ) -> None:
         self.domain = domain
@@ -265,6 +267,8 @@ class Loader:
         self.time_frame = domain.time_frame
         self.filter_channels = domain.channels
         self.ptp_thresh = ptp_thresh
+        self.subject_nums = subject_nums
+        self.session_nums = session_nums
         self.verbose = verbose
 
         self.shape = MAX_SHAPE
@@ -291,11 +295,15 @@ class Loader:
             if self.verbose:
                 print(f"Processing file ({i}/{file_count}) {file_path}...")
             try:
+                subject, session = extract_integers(file.stem)
+                if self.subject_nums and subject not in self.subject_nums:
+                    continue
+                if self.session_nums and session not in self.session_nums:
+                    continue
                 file_data = loadmat(file_path, simplify_cells="True")["BCI"]
                 if self.subject_spec and not self.subject_spec.passes(file_data["metadata"]):
                     # print(f"Skipping {file_path} (subject does not fit specification).")
                     continue
-                subject, _ = extract_integers(file.stem)
                 if subject:
                     self.subjects.add(subject)
                 self.process_data(file_data)
@@ -362,10 +370,7 @@ class Loader:
                 self.out_labels.append(label)
 
 if __name__ == "__main__":
-    used_channels = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
-    domain = LoadDomain(task=None, time_frame=(2000, 6000), channels=used_channels)
-    subject_spec = SubjectSpec(gender="F", age_range=(18, 28), handedness="R")
-    loader = Loader(domain=domain, subject_spec=subject_spec)
+    loader = Loader(subject_nums=[1])
     ds, stats = loader.load_dir(Path(argv[1]))
     print(stats)
     torch.save(ds, argv[2])
