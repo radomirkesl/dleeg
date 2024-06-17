@@ -122,6 +122,11 @@ The convolutional layer is the core of CNNs. It applies small-sized filters, als
 
 Pooling layers aim to further reduce the dimensionality by applying a function over a kernel-sized window of the input. The most common pooling function is max pooling, which outputs the maximum value in the window, but average pooling is common as well. While this operation generally preserves the most important information, it is still destructive in nature. For this reason, a kernel of size 2x2 is usually used. With a step of 2 (moving the kernel two spaces at a time) this results in a 75\% reduction of the input~\cite{oshea:cnn:15}.
 
+\begin{figure}[ht]
+	\includegraphics[width=0.75\textwidth]{fig/maxpool.png}
+	\caption{Max pooling operation with a kernel of size 2x2 and step of 2. Source: \href{https://commons.wikimedia.org/wiki/File:Max_pooling.png}{\textit{Wikimedia Commons}}.}
+\end{figure}
+
 Overall CNNs' ability to extract patterns and reduce the complexity of models proves to be very useful in a variety of tasks, including EEG classification, where it can even overcome the noisiness~\cite{zhang:similar:20}.
 
 \chapter{State-of-the-art}
