@@ -41,9 +41,17 @@ In this chapter various concepts, important for the area are explained in the fo
 
 Electroencephalography (EEG) is possibly the most frequently used method of recording brain activity. It is conducted by planting electrodes on the scalp and making a record of the changing voltage (\cite{berger:eeg:29}, as cited by \cite{luck:erp:book}). This approach tends to be relatively convenient, as the required assets are not too costly, can be applied and removed non-invasively and even allow for user mobility~\cite{padfield:bci:19}.
 
+The electrodes are usually placed according to the international 10-20 system, or alternatively with the newer 10-10 system. The numbers represent the percentage of the size of the skull, which is used to determine the space between the electrodes. In the 10-20 system it is 10\% and 20\% of the left-to-right and front-to-back direction, in the 10-10 system it is 10\% in both directions, resulting in more electrode placement options~\cite{acharya:channels:16}. The electrodes are marked with letters and numbers. The letters are as follows: A for ear lobe, T for temporal, F  for frontal, C for central, P for parietal and O for occipital. In the 10-10 system, letters can also come in pairs, denoting electrodes placed between two neighbouring areas. The numbers are odd for the left hemisphere and even for the right hemisphere, increasing with distance from the centre, which is marked with a 'z' instead.
+
+\begin{figure}[h]
+	\label{fig:channels}
+	\includegraphics[width=\textwidth]{fig/channels.png}
+	\caption{The 10-10 system of electrode placement. Source: \href{https://commons.wikimedia.org/wiki/File:EEG_10-10_system_with_additional_information.svg}{\textit{Wikimedia Commons}}.}
+\end{figure}
+
 One of the main advantages (along with the cost and convenience) of EEG is its great temporal resolution granted by the high speed of electric field propagation~\cite{roy:eeg:review:19}. On the other hand, the spatial resolution is often not great, which is caused by the tissues between the brain and the electrodes~\cite{roy:eeg:review:19, berezutskaya:ieeg:22}. A single electrode also obtains signals from several overlapping neural sources, leading to spatial correlation between the channels, making it difficult to isolate the desired information~\cite{roy:eeg:review:19, luck:erp:book}. In addition to that EEG also suffers noise from unrelated physiological signals, such as electromyogram from eye blinks~\cite{craik:dl:eeg:rev:19}.
 
-It is worth noting that EEG can also be recorded intracranially (iEEG), possibly overcoming or at least reducing many of these issues. It is conducted by planting the electrodes directly on the brain tissue, which is obviously highly invasive and that tends to be a severe limitation, considering the risks and costs associated. There are, however, procedures that already involve the implantation process, such as localization of the source of epileptic seizures, or their treatment in durg-resistant patients~\cite{jobst:iEEG:20}. These provide a great opportunity to keep the records for other purposes as well~\cite{berezutskaya:ieeg:22}.
+It is worth noting that EEG can also be recorded intracranially (iEEG), possibly overcoming or at least reducing many of these issues. It is conducted by planting the electrodes directly on the brain tissue, which is obviously highly invasive and that tends to be a severe limitation, considering the risks and costs associated. There are, however, procedures that already involve the implantation process, such as localization of the source of epileptic seizures, or their treatment in drug-resistant patients~\cite{jobst:iEEG:20}. These provide a great opportunity to keep the records for other purposes as well~\cite{berezutskaya:ieeg:22}.
 
 Lastly, one more disadvantage of EEG is high inter-subject variability caused by different physiology of subjects~\cite{roy:eeg:review:19}. This especially affects classification tasks that try to generalize over a large population. Intra-subject approach bypasses this problem, but introduces a new one --- the need for a large amount of data from each subject to train a unique classifier for them.
 
@@ -69,12 +77,20 @@ Motor imagery tasks seem to be among the most practical in BCI applications.
 They rely on the subject imagining a movement of a part of their body without actually performing it~\cite{craik:dl:eeg:rev:19}.
 The BCI then attempts to discern the imagined motion and passes the information to a connected system (assistant device, computer, \dots).
 
-One of the main advantages of this approach is that motor imagery (imagining a movement) tends to have a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01} which can help verify the accuracy of the measurement, among other neurophysiological benefits~[\emph{ibid.}].
-That essentially means that we can record brain activity of subjects performing the movement and later compare it to the recordings from subjects imagining the movement to achieve better certainty that the data is valuable. If the data from motor imagery is nowhere near the data from performing movement, we can assume it is flawed (distracted subject, failed recording device, \dots) and exclude it from the final dataset.
-It also means that we have a better idea of what to look for in the patterns of brain activity and that we could potentially feed this information to neural networks --- learn them on data from performing movements instead of (or as well as) imagining them.
+An interesting property of motor imagery is that it tends to have a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01}. An important type of brain oscillation is the mu rhythm, also called the sensorimotor rhythm (SMR). It originates in the sensorimotor cortex and has frequencies in the range of 6-13 Hz. Its amplitude can become greatly suppressed in response to an internal or external event, such as sensory input, movement or mental imagery. This is often referred to as event-related desynchronization (ERD) and the usually following amplitude enhancement is called event-related synchronization (ERS). In SMR, ERD occurs with planning and initiating the execution of a movement and shortly after, ERS begins, returning to the original level within a few seconds. These activities seem to be present in the primary sensorimotor cortex with motor imagery similarly to actual motion performance, even though to a lesser extent~\cite{pfurtscheller:mi:01}. They can be most prominently measured on the C3, Cz and C4 electrodes, which are placed over the primary sensorimotor cortex, but also in the neighbouring ones, which you can see in figure \ref{fig:channels}.
 
-An advantage of motor imagery is that it simulates natural ways in which humans control their movement. For example, imagining walking could be used to control assistant devices, like a wheelchair or a prosthetic leg, which would be a lot more natural than buttons and joysticks. In addition, motor imagery can be exceptionally useful in rehabilitation, as discussed in section \ref{sec:bci}.
+\begin{figure}[h]
+	\includegraphics[width=\textwidth]{fig/erders.png}
+	\caption{Ongoing EEG with right finger movement, $t=0s$ marks the start of movement. Note ERD prior to movement onset and ERS during movement \textcopyright 2001 IEEE,~\cite{pfurtscheller:mi:01}.}
+\end{figure}
 
+% 2) In the case of illustrations or tabular material, we require that the copyright line © [Year of original publication] IEEE appear prominently with each reprinted figure and/or table.
+
+% One of the main advantages of this approach is that motor imagery (imagining a movement) tends to have a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01} which can help verify the accuracy of the measurement, among other neurophysiological benefits~[\emph{ibid.}].
+% That essentially means that we can record brain activity of subjects performing the movement and later compare it to the recordings from subjects imagining the movement to achieve better certainty that the data is valuable. If the data from motor imagery is nowhere near the data from performing movement, we can assume it is flawed (distracted subject, failed recording device, \dots) and exclude it from the final dataset.
+% It also means that we have a better idea of what to look for in the patterns of brain activity and that we could potentially feed this information to neural networks --- learn them on data from performing movements instead of (or as well as) imagining them.
+
+One advantage of motor imagery for BCI purposes is that it simulates natural ways in which humans control their movement. For example, imagining walking could be used to control assistant devices, like a wheelchair or a prosthetic leg, which would be a lot more natural than buttons and joysticks~\cite{he:bci:legs:18}. In addition, motor imagery can be exceptionally useful in rehabilitation, as discussed in section \ref{sec:bci}.
 
 \section{Data Availability}
 
@@ -82,11 +98,31 @@ The lack of large, extensive datasets tends to be a problem while attempting to 
 
 Data augmentation (DA) --- a method of dealing with overfitting via generating additional data based on existing data --- tends to be a valuable tool in NN processing of brain activity recordings, because of the lack of complex datasets described earlier~\cite{he:da:21}. It carries some potential risks, such as reduced performance, but it usually succeeds in increasing accuracy of neural networks~[\emph{ibid.}].
 
+% TODO: Maybe
+% \section{Data Representation}
+
 \section{Deep Learning Classification}
+
+In this section, deep learning architectures that are later used in experiments are briefly described. That involves Convolutional Neural Networks, Long Short Term Memory Networks and Transformer Networks.
 
 % TODO: CNN, LSTM, Transformer
 
 \subsection{Convolutional Neural Network}
+
+Convolutional Neural Network (CNN) is a type of neural network, originally mostly aimed at image classification. However, its main draw is its ability to extract patterns from the data, greatly reducing its dimensionality before classification, which applies to many types of data besides images. This reduction is achieved by only connecting neurons to a small part of the previous layer~\cite{oshea:cnn:15}. Because of its use in image processing, we often think about two-dimensional CNNs, applied to 2D data, but they can also be used for 3D data or, for our purposes, 1D data, such as the time series of EEG recordings.
+
+The main components of Convolutional Neural Networks (CNNs) are convolutional layers and pooling layers. Fully connected layers, same as in standard multilayer perceptrons, are also needed to generate the final class scores for classification. Activation functions like ReLU are also usually used, and dropout layers can be added optionally to help prevent overfitting.
+
+The convolutional layer is the core of CNNs. It applies small-sized filters, also called kernels to the input, convolving across it. That essentially means it slides through the input and computes scalar dot products between the kernel and each position in the input. The weights in the kernels, called activations, are what is actually learned by the model during training~\cite{oshea:cnn:15}. In a typical image classification task, such as the MNIST database of written digits, these can for example pick up on curves of the digits. Similarly, they are able to learn to recognize patterns in EEG data, such as the mu rhythm, or the event-related desynchronization and synchronization.
+
+\begin{figure}[h]
+	\includegraphics[width=\textwidth]{fig/conv.png}
+	\caption{Convolution operation with a kernel of size 3x3 and step of 1. Step denotes by how many spaces the filter is moved every iteration. Source: \href{https://commons.wikimedia.org/wiki/File:CNN-filter-animation-1.gif}{\textit{Wikimedia Commons}}.}
+\end{figure}
+
+Pooling layers aim to further reduce the dimensionality by applying a function over a kernel-sized window of the input. The most common pooling function is max pooling, which outputs the maximum value in the window, but average pooling is common as well. While this operation generally preserves the most important information, it is still destructive in nature. For this reason, a kernel of size 2x2 is usually used. With a step of 2 (moving the kernel two spaces at a time) this results in a 75\% reduction of the input~\cite{oshea:cnn:15}.
+
+Overall CNNs' ability to extract patterns and reduce the complexity of models proves to be very useful in a variety of tasks, including EEG classification, where it can even overcome the noisiness~\cite{zhang:similar:20}.
 
 \chapter{State-of-the-art}
 

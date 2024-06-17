@@ -78,12 +78,11 @@ class CNN_LSTM(L.LightningModule):
             in_features=hidden_size,
             out_features=feature_count,
         )
-        self.loss = nn.CrossEntropyLoss()
+        self.train_loss = nn.CrossEntropyLoss()
+        self.val_loss = nn.CrossEntropyLoss()
 
         self.metrics = build_general_metrics()
         self.saved_metrics: Dict
-
-        self.save_hyperparameters()
 
     def forward(self, x):
         x = self.conv1(x)
@@ -101,14 +100,14 @@ class CNN_LSTM(L.LightningModule):
     def training_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        loss = self.loss(outputs, labels)
+        loss = self.train_loss(outputs, labels)
         self.log("train_loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
-        val_loss = self.loss(outputs, labels)
+        val_loss = self.val_loss(outputs, labels)
         self.log("val_loss", val_loss)
 
     def test_step(self, batch, batch_idx):
