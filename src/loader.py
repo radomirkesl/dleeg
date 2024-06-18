@@ -1,4 +1,5 @@
 import gc
+import re
 from dataclasses import dataclass
 from enum import IntEnum
 from pathlib import Path
@@ -7,7 +8,6 @@ from typing import Any, Dict, List, Literal, Optional, Set, Tuple
 
 import numpy as np
 import torch
-from lightning_fabric.plugins.environments.slurm import re
 from scipy.io import loadmat
 from torch.utils.data import TensorDataset
 
@@ -76,7 +76,7 @@ POSSIBLE_CHANNELS = [
     "CB2",
 ]
 MAX_CHANNEL_COUNT = len(POSSIBLE_CHANNELS)
-MAX_DATA_LEN = 11041
+MAX_DATA_LEN = 12000
 MAX_SHAPE = (MAX_CHANNEL_COUNT, MAX_DATA_LEN)
 C_CHANNELS = [chan for chan in POSSIBLE_CHANNELS if "C" in chan]
 
@@ -92,7 +92,7 @@ class LoadDomain:
     task: Optional[Task]
     time_frame: Optional[Tuple[int, int]]
     channels: List[str]
-    
+
     def __str__(self):
         chan_string = ""
         for i, chan in enumerate(self.channels):
@@ -103,7 +103,7 @@ class LoadDomain:
 Time Frame: {self.time_frame if self.time_frame else 'FULL'}
 {len(self.channels)} Channels:
 {chan_string}"""
-    
+
     def to_dict_hr(self) -> Dict[str, Any]:
         return {
             "task": self.task.name.replace("_", " ") if self.task else "ALL",
@@ -127,28 +127,34 @@ class SubjectSpec:
 
     def to_dict_hr(self) -> Dict[str, Any]:
         return {
-                "gender": self.gender if self.gender else "ANY",
-                "age_range": self.age_range if self.age_range else "ANY",
-                "handedness": self.handedness if self.handedness else "ANY",
-                "mbsr": self.mbsr if self.mbsr else "IRRELEVANT",
-                "meditation_hours_range": self.meditation_hours_range if self.meditation_hours_range else "ANY",
-                "instrument": self.instrument if self.instrument else "IRRELEVANT",
-                "athlete": self.athlete if self.athlete else "IRRELEVANT",
-                "handsport": self.handsport if self.handsport else "IRRELEVANT",
-                "hobby": self.hobby if self.hobby else "IRRELEVANT",
+            "gender": self.gender if self.gender else "ANY",
+            "age_range": self.age_range if self.age_range else "ANY",
+            "handedness": self.handedness if self.handedness else "ANY",
+            "mbsr": self.mbsr if self.mbsr else "IRRELEVANT",
+            "meditation_hours_range": (
+                self.meditation_hours_range if self.meditation_hours_range else "ANY"
+            ),
+            "instrument": self.instrument if self.instrument else "IRRELEVANT",
+            "athlete": self.athlete if self.athlete else "IRRELEVANT",
+            "handsport": self.handsport if self.handsport else "IRRELEVANT",
+            "hobby": self.hobby if self.hobby else "IRRELEVANT",
         }
 
     def passes(self, subject_metadata: Dict) -> bool:
         if self.gender and subject_metadata["gender"] != self.gender:
             return False
-        if self.age_range and not (self.age_range[0] <= subject_metadata["age"] < self.age_range[1]):
+        if self.age_range and not (
+            self.age_range[0] <= subject_metadata["age"] < self.age_range[1]
+        ):
             return False
         if self.handedness and subject_metadata["handedness"] != self.handedness:
             return False
         if self.mbsr is not None and bool(subject_metadata["MBSRsubject"]) != self.mbsr:
             return False
         if self.meditation_hours_range and not (
-            self.meditation_hours_range[0] <= subject_metadata["meditationpractice"] < self.meditation_hours_range[1]
+            self.meditation_hours_range[0]
+            <= subject_metadata["meditationpractice"]
+            < self.meditation_hours_range[1]
         ):
             return False
         if self.instrument and subject_metadata["instrument"] not in self.instrument:
@@ -194,7 +200,9 @@ class DataSetStats:
             "ptp_refused": self.ptp_refused,
             "ptp_thresh": self.ptp_thresh,
             "domain": self.domain.to_dict_hr(),
-            "subject_spec": self.subject_spec.to_dict_hr() if self.subject_spec else "NONE",
+            "subject_spec": (
+                self.subject_spec.to_dict_hr() if self.subject_spec else "NONE"
+            ),
             "subject_count": len(self.subjects),
             "subjects": self.subjects,
         }
@@ -241,9 +249,9 @@ class DataSetStats:
 
 def extract_integers(filename: str) -> Tuple[int | None, int | None]:
     pattern = r"S(\d+)_Session_(\d+)"
-    
+
     match = re.search(pattern, filename)
-    
+
     if match:
         subject = int(match.group(1))
         session = int(match.group(2))
@@ -251,16 +259,19 @@ def extract_integers(filename: str) -> Tuple[int | None, int | None]:
     else:
         return None, None
 
+
 class Loader:
     def __init__(
         self,
-        domain: LoadDomain = LoadDomain(task=None, time_frame=(2000, 6000), channels=C_CHANNELS),
+        domain: LoadDomain = LoadDomain(
+            task=None, time_frame=(2000, 6000), channels=C_CHANNELS
+        ),
         subject_spec: Optional[SubjectSpec] = None,
         ptp_thresh: Optional[int] = 130,
         subject_nums: Optional[List[int]] = None,
         session_nums: Optional[List[int]] = None,
         verbose: bool = False,
-        ) -> None:
+    ) -> None:
         self.domain = domain
         self.subject_spec = subject_spec
         self.filter_task = domain.task
@@ -285,7 +296,7 @@ class Loader:
         self.subjects: Set[int] = set()
 
     def load_dir(
-            self,
+        self,
         directory_path: Path,
     ) -> Tuple[TensorDataset, DataSetStats]:
         files = list(directory_path.glob("*.mat"))
@@ -301,8 +312,9 @@ class Loader:
                 if self.session_nums and session not in self.session_nums:
                     continue
                 file_data = loadmat(file_path, simplify_cells="True")["BCI"]
-                if self.subject_spec and not self.subject_spec.passes(file_data["metadata"]):
-                    # print(f"Skipping {file_path} (subject does not fit specification).")
+                if self.subject_spec and not self.subject_spec.passes(
+                    file_data["metadata"]
+                ):
                     continue
                 if subject:
                     self.subjects.add(subject)
@@ -311,13 +323,19 @@ class Loader:
                 print(f"Invalid file: {file_path}, received error: {e}")
             gc.collect()
         if len(self.out_data) == 0:
-            raise ValueError("No data loaded. There are no files in the directory that are valid and match the criteria.")
+            raise ValueError(
+                "No data loaded. There are no files in the directory that are valid and match the criteria."
+            )
         if self.ptp_thresh:
             refused = self.refused_trials / self.total_trials
         else:
             refused = 0
-        data = torch.tensor(np.array(self.out_data, dtype=np.float32), dtype=torch.float32)
-        labels = torch.tensor(np.array(self.out_labels, dtype=np.uint8), dtype=torch.uint8)
+        data = torch.tensor(
+            np.array(self.out_data, dtype=np.float32), dtype=torch.float32
+        )
+        labels = torch.tensor(
+            np.array(self.out_labels, dtype=np.uint8), dtype=torch.uint8
+        )
         ds = TensorDataset(data, labels)
         return ds, DataSetStats(
             ptp_thresh=self.ptp_thresh,
@@ -332,46 +350,48 @@ class Loader:
         )
 
     def process_data(
-            self,
-            file_data: Dict,
+        self,
+        file_data: Dict,
     ):
-            channel_indices = np.array(
-                [
-                    np.where(chan == file_data["chaninfo"]["label"])
-                    for chan in self.filter_channels
-                ]
-            ).squeeze()
+        channel_indices = np.array(
+            [
+                np.where(chan == file_data["chaninfo"]["label"])
+                for chan in self.filter_channels
+            ]
+        ).squeeze()
 
-            for data, trial_data in zip(
-                file_data["data"], file_data["TrialData"], strict=True
-            ):
-                task = Task(trial_data["tasknumber"])
-                if self.filter_task is not None and task != self.filter_task:
+        for data, trial_data in zip(
+            file_data["data"], file_data["TrialData"], strict=True
+        ):
+            task = Task(trial_data["tasknumber"])
+            if self.filter_task is not None and task != self.filter_task:
+                continue
+            data = data[channel_indices]
+            if self.time_frame is not None:
+                data = data[
+                    :, self.time_frame[0] : min(self.time_frame[1], data.shape[1])
+                ]
+            if self.ptp_thresh:
+                self.total_trials += 1
+                ptp_maxamp = np.max(np.ptp(data, axis=1))
+                if ptp_maxamp > self.ptp_thresh:
+                    self.refused_trials += 1
                     continue
-                data = data[channel_indices]
-                if self.time_frame is not None:
-                    data = data[:, self.time_frame[0] : min(self.time_frame[1], data.shape[1])]
-                if self.ptp_thresh:
-                    self.total_trials += 1
-                    ptp_maxamp = np.max(np.ptp(data, axis=1))
-                    if ptp_maxamp > self.ptp_thresh:
-                        self.refused_trials += 1
-                        continue
-                if data.shape[1] != self.shape[1]:
-                    pad_width = self.shape[1] - data.shape[1]
-                    data = np.pad(data, pad_width=((0, 0), (0, pad_width)), mode="reflect")
-                if trial_data["result"] == 1:
-                    self.success_count += 1
-                if trial_data["forcedresult"]:
-                    self.forced_success_count += 1
-                self.out_data.append(data)
-                label = trial_data["targetnumber"] - 1
-                self.class_balance[label] += 1
-                self.out_labels.append(label)
+            if data.shape[1] != self.shape[1]:
+                pad_width = self.shape[1] - data.shape[1]
+                data = np.pad(data, pad_width=((0, 0), (0, pad_width)), mode="reflect")
+            if trial_data["result"] == 1:
+                self.success_count += 1
+            if trial_data["forcedresult"]:
+                self.forced_success_count += 1
+            self.out_data.append(data)
+            label = trial_data["targetnumber"] - 1
+            self.class_balance[label] += 1
+            self.out_labels.append(label)
+
 
 if __name__ == "__main__":
     loader = Loader(subject_nums=[1], verbose=True)
     ds, stats = loader.load_dir(Path(argv[1]))
     print(stats)
     torch.save(ds, argv[2])
-

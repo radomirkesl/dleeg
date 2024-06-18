@@ -189,6 +189,7 @@ Based on our findings, the Stieger-62 dataset was chosen for further experimenta
 % TODO: Review and edit
 
 \subsection{Stieger-62 Dataset}
+\label{subsec:stieger-62}
 
 The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by Stieger et al.~\cite{data:stieger:21} appears to be among the best in class with more than 250000 trials from 62 subjects, collected over 7--11 sessions.
 The task in these experiments was moving a cursor via imagining hand movement. The subject was supposed to imagine opening and closing their left or right hand to move the cursor in the respective direction, opening and closing both hands at once to move the cursor up and clearing their mind to move the cursor down. Third of the trials was limited to up-down movement, third to left-right movement and the rest in both dimensions.
@@ -241,12 +242,68 @@ A system like this could for example simplify the experiment procedure and incre
 
 \chapter{Implementation}
 
-In this chapter, the specifics of the experiment, that was conducted in this work are explained. Most of these came about from an agreement with the thesis advisor or were the result of "metaexperimentation" during the development. By metaexperimentation, manual testing of models with different architectures and hyperparameters built upon a small subset of the dataset, as well as with different preprocessing approaches, is meant.
+In this chapter, the specifics of the experiment, that was conducted in this work are explained. Most of these came about from an agreement with the thesis advisor or were the result of "metaexperimentation" during the development. By metaexperimentation, manual testing of models with different architectures and hyperparameters built upon a small subset of the dataset, as well as with different preprocessing approaches, is meant. Note that all the parameters and hyperparameters that were chosen in this way and used in the experiments are set as defaults in the associated code.
 
 The Stieger-62 dataset was eventually selected for the experiments and the general decided direction was to focus on models for a specific group of subjects, based on shared metadata.
 
-\appendix
-\chapter{Appendix A}
+The resulting application has been split into two independently working parts. The first part is a data processing tool, the purpose of which is to load the data, as provided by the dataset authors, process it and save it in a format, which is then directly digestible by the models. This includes filtering the data, based on subject metadata, artefact removal and more. The second part is capable of training and testing the models themselves. Its output is a trained model for potential future use and a report on the model's performance.
+
+Both parts were built in the Python programming language, using the following libraries:
+
+\paragraph{NumPy:} A library providing high-level mathematical operations, mostly for working with n-dimensional arrays. In this work it is used during the loading process, for reducing the data in the desired way and artefact removal.
+
+\paragraph{SciPy:} A library providing mostly tools for scientific computing. Here it is only used for loading \texttt{MATLAB}-formatted data into Python's structures (dictionaries and \texttt{NumPy} arrays).
+
+\paragraph{PyTorch:} A mostly deep learning-focused library, providing tools for building and training neural networks. It has a relatively low level of abstraction, allowing for high control over the models. \texttt{PyTorch} mostly works with tensors, which are similar to \texttt{NumPy} arrays, but can for example be moved to an accelerator (such as a GPU) for faster computation. It is mainly used to create the architecture of the models, but the loader also saves the data as \texttt{PyTorch} tensors.
+
+\paragraph{Scikit-learn:} A library providing tools for machine learning. It is only used for creating folds for k-fold cross-validation.
+
+\paragraph{PyTorch Lightning:} A library built on top of \texttt{PyTorch}, providing a higher level of abstraction, sacrificing control in order to reduce boilerplate code and increase readability. It is used for the training and testing processes.
+
+\paragraph{TorchMetrics:} A library providing high-level tools for gathering metrics for \texttt{PyTorch} and \texttt{PyTorch Lightning} models. It is used to gather metrics while testing the models.
+
+\section{Data Loading and Preprocessing}
+
+Most of this work is done by the \texttt{Loader} class in the \texttt{loader.py} file and its method \texttt{load\_dir}, which when pointed to a directory will load all the \texttt{.mat} files in it, process them and return the data in the form of \texttt{PyTorch}'s \texttt{TensorDataset} as well as information about the data. Upon construction, the \texttt{Loader} is passed a group of parameters, defining what part of the dataset it will specifically load. These parameters are explained throughout this chapter. In addition to that, a \texttt{LoadSuite} class is provided (in \texttt{load\_suite.py}), which adds the ability to run multiple loads in succession, allowing to load multiple subsets of the dataset and save them in a structured way, along with the metadata.
+
+\subsection{Data Format}
+
+As stated previously, the Stieger-62 dataset, described in \ref{subsec:stieger-62} is used. It was recorded from 62 subjects of age 18--63, 49 of which are female. Seven or eleven sessions were recorded with each user, consisting of 450 trials each, 150 per task. The tasks were moving a cursor up and down, left and right and in both dimensions. The data was recorded using a 64-channel EEG cap, with a sampling rate of 1000 Hz.
+
+The set is provided as a collection of \texttt{MATLAB .mat} files, each coming from a single recording session from a single subject, resulting in 598 files total. Each file contains the raw data, trial-specific metadata, subject-specific metadata and channel information.
+The data is stored separately for each trial. Along with it, the duration of each trial is stored, as it differs between trials. Additionally, the cursor position at every recording moment (millisecond) is stored, as well as the recording rate, though the latter is constant for all trials.
+The trial-specific metadata includes the task, the target, the result (whether the trial was successful online) and more.
+The subject-specific metadata includes the age, gender, laterality, but also whether the subject considers themselves an athlete, has a hobby that requires fine motor skills and so on.
+
+For more specifics, see \href{https://figshare.com/articles/dataset/Human_EEG_Dataset_for_Brain-Computer_Interface_and_Meditation/13123148?file=25302482}{\textit{the repository}} or the related data paper~\cite{data:stieger:21}.
+
+\subsection{File selection}
+
+As stated previously, the main goal of the experiment would be to train intra-subject models, but based on shared metadata. Since the dataset is provided in separate files by session, we can process them one by one, only adding to the dataset trials from the subjects that meet our criteria, avoiding the need to hold more than one \texttt{.mat} file in memory at a time (we still need to hold all the accepted trials in order to be able to save them as \texttt{PyTorch} tensors). This is the first step of the data loading process.
+
+The first tool the \texttt{Loader} class provides is the ability to hand-pick specific users or sessions by number. These can be provided to the \texttt{Loader} as constructor arguments in the form of lists. This can be useful for example for creating small datasets for testing purposes, or for selecting only the later sessions, where users are expected to be more proficient. It also speeds up the loading process, because this information is encoded in file names, so the \texttt{Loader} does not need to actually load the \texttt{.mat} files, which were not selected.
+
+The main idea, however, is accepting only trials from subjects who match a specific set of criteria. For this reason, the \texttt{load\_dir} method always first (after loading the file) checks, whether the subject specific metadata matches the criteria and if not, immediately moves on to the next file. The criteria are passed to the \texttt{Loader} as a \texttt{SubjectSpec} object, which is a dataclass, where the required criteria can be specified. The options correspond to subject-specific metadata fields in the dataset and can be seen in code sample \ref{lst:subjectspec}. This class implements a \texttt{passes} method, which checks a dictionary of subject metadata (directly extracted from the loaded file by the \texttt{load\_dir} method) against the criteria it represents.
+
+\begin{code}{Python}{Header of the SubjectSpec dataclass. All of these fields can be set in the constructor. If a field is set to \texttt{None}, this criterion will not be checked. The "\texttt{range}" criteria are inclusive on the lower end and exclusive on the upper end.\label{lst:subjectspec}}
+	@dataclass
+	class SubjectSpec:
+	gender: Optional[Literal["M", "F"]] = None
+	age_range: Optional[Tuple[int, int]] = None
+	handedness: Optional[Literal["R", "L"]] = None
+	mbsr: Optional[bool] = None
+	meditation_hours_range: Optional[Tuple[float, float]] = None
+	instrument: Optional[List[Literal["Y", "U", "N"]]] = None
+	athlete: Optional[List[Literal["Y", "U", "N"]]] = None
+	handsport: Optional[List[Literal["Y", "U", "N"]]] = None
+	hobby: Optional[List[Literal["Y", "U", "N"]]] = None
+\end{code}
+
+\subsection{Preprocessing}
+
+
+% \appendix
+% \chapter{Appendix A}
 
 \backmatter
 \printbibliography
