@@ -1,0 +1,89 @@
+{
+    "shape": [
+        50736,
+        23,
+        4000
+    ],
+    "online_accuracy": 0.5081401766004415,
+    "forced_online_accuracy": 0.6340074109113845,
+    "class_balance": [
+        12840,
+        12578,
+        13785,
+        11533
+    ],
+    "ptp_refused": 0.5181720624127485,
+    "ptp_thresh": 130,
+    "domain": {
+        "task": "ALL",
+        "time_frame": [
+            2000,
+            6000
+        ],
+        "channel_count": 23,
+        "channels": [
+            "FC5",
+            "FC3",
+            "FC1",
+            "FCZ",
+            "FC2",
+            "FC4",
+            "FC6",
+            "C5",
+            "C3",
+            "C1",
+            "CZ",
+            "C2",
+            "C4",
+            "C6",
+            "CP5",
+            "CP3",
+            "CP1",
+            "CPZ",
+            "CP2",
+            "CP4",
+            "CP6",
+            "CB1",
+            "CB2"
+        ]
+    },
+    "subject_spec": {
+        "gender": "ANY",
+        "age_range": [
+            50,
+            100
+        ],
+        "handedness": "ANY",
+        "mbsr": "IRRELEVANT",
+        "meditation_hours_range": "ANY",
+        "instrument": "IRRELEVANT",
+        "athlete": "IRRELEVANT",
+        "handsport": "IRRELEVANT",
+        "hobby": "IRRELEVANT"
+    },
+    "subject_count": 22,
+    "subjects": [
+        2,
+        4,
+        7,
+        10,
+        11,
+        15,
+        19,
+        26,
+        29,
+        30,
+        32,
+        33,
+        34,
+        36,
+        37,
+        38,
+        41,
+        42,
+        46,
+        50,
+        54,
+        58
+    ]
+}
