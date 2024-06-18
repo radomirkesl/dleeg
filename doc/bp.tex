@@ -227,6 +227,7 @@ This issue appears to be worth investigating via experimentation and the Med-62 
 Additionally, similar experiments could be performed with focus on users who received training in meditation instead of or in addition to using the later sessions.
 
 \section{Metadata Specific Training}
+\label{sec:metadata:specific}
 
 Another, slightly similar, approach that could be attempted is trying to find a classifier which would best work for a specific group of subjects based on a shared quality, such as gender, age and task-specific subject traits (such as dominant hand in the case of motor imagery). This could be done by training an entire subject-specific classifier which in case of long term used systems, such as BCI-operated assistant devices, would probably still be worth the extra work, or by pre-training a general classifier and then adding specializations for each user.
 
@@ -237,6 +238,12 @@ This approach seems to require a large amount of data equipped with profound met
 Speaking from a completely different perspective, it does seem that this area of research could benefit from a more unified approach to some procedures, such as data recording and especially storage. A system where the data is in a single binary file could be designed. All the metadata could be in an external database or a similar system which would provide very fast access to any subset of the dataset, based on the metadata --- basically via simple queries.
 
 A system like this could for example simplify the experiment procedure and increase the performance of metadata specific training discussed above. However, unification of the storage would probably be just useful in general, it could lead to better comparability between studies and much more complex and useful benchmarks.
+
+\chapter{Implementation}
+
+In this chapter, the specifics of the experiment, that was conducted in this work are explained. Most of these came about from an agreement with the thesis advisor or were the result of "metaexperimentation" during the development. By metaexperimentation, manual testing of models with different architectures and hyperparameters built upon a small subset of the dataset, as well as with different preprocessing approaches, is meant.
+
+The Stieger-62 dataset was eventually selected for the experiments and the general decided direction was to focus on models for a specific group of subjects, based on shared metadata.
 
 \appendix
 \chapter{Appendix A}
