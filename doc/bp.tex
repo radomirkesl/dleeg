@@ -33,9 +33,7 @@ This paper focuses on the application of neural networks on data from recordings
 
 \chapter{Background}
 
-In this chapter various concepts, important for the area are explained in the following order. First the prevalent ways of recording brain activity are discussed, secondly examples of tasks which use neural networks and these recordings are presented, after that the basic types of modern neural networks are shown and finally data availability is briefly considered.
-
-% TODO: Change this to reflect what actually is here
+In this chapter various concepts, important for the area of this work are briefly explained in the following order. First, electroencephalography is explained, secondly, brain-computer interfaces are discussed, after that motor imagery, a common task for brain-computer interfaces and electroencephalography, is introduced, before shortly mentioning data availability, one of the area's weaknesses. Lastly, deep learning classiffiers later used in the work are explained.
 
 \section{Electroencephalography}
 
@@ -123,11 +121,24 @@ The convolutional layer is the core of CNNs. It applies small-sized filters, als
 Pooling layers aim to further reduce the dimensionality by applying a function over a kernel-sized window of the input. The most common pooling function is max pooling, which outputs the maximum value in the window, but average pooling is common as well. While this operation generally preserves the most important information, it is still destructive in nature. For this reason, a kernel of size 2x2 is usually used. With a step of 2 (moving the kernel two spaces at a time) this results in a 75\% reduction of the input~\cite{oshea:cnn:15}.
 
 \begin{figure}[ht]
+	\centering
 	\includegraphics[width=0.75\textwidth]{fig/maxpool.png}
 	\caption{Max pooling operation with a kernel of size 2x2 and step of 2. Source: \href{https://commons.wikimedia.org/wiki/File:Max_pooling.png}{\textit{Wikimedia Commons}}.}
 \end{figure}
 
 Overall CNNs' ability to extract patterns and reduce the complexity of models proves to be very useful in a variety of tasks, including EEG classification, where it can even overcome the noisiness~\cite{zhang:similar:20}.
+
+\subsection{Long Short-Term Memory Network}
+
+Recurrent Neural Networks (RNNs) are a type of neural network designed to process sequential data. They are able to remember previous inputs, which makes them suitable for time series data (such as EEG recordings). However, they tend to struggle with long-term dependencies, because of the vanishing and exploding gradient problem, a common issue with RNNs. This issue occurs during backpropagation, when the gradient is lower than 0 and the repeated multiplication leads to convergence towards 0 (vanishing) or higher than 1, converging towards infinity (exploding).
+
+Long Short-Term Memory network is a type of RNN, designed to overcome this issue. It has a more complex structure, with a cell state, modifiable by gates, which are essentially neural networks themselves. The forget gate decides what information to forget (remove from the cell state), the input gate decides what information to add and with what weights, and the output gate decides what information to output. This structure allows the LSTM to remember information for a longer time, making it suitable for tasks with long-term dependencies~\cite{olah:lstm:15}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{fig/lstm.png}
+	\caption{LSTM unit. $F_t$ marks the forget gate, $I_t$ is the input gate and $O_t$ the output gate. $C$ symbolizes the cell state, $h$ the hidden state, $X$ marks the input, which gets concatenated with $h$ and $O$ marks the output, which is actually just a copy of $h$. Source: \href{https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg}{\textit{Wikimedia Commons}}.}
+\end{figure}
 
 \chapter{State-of-the-art}
 
@@ -183,39 +194,41 @@ The Human EEG Dataset for Brain-Computer Interface and Meditation, collected by 
 The task in these experiments was moving a cursor via imagining hand movement. The subject was supposed to imagine opening and closing their left or right hand to move the cursor in the respective direction, opening and closing both hands at once to move the cursor up and clearing their mind to move the cursor down. Third of the trials was limited to up-down movement, third to left-right movement and the rest in both dimensions.
 The 2D movement is a relatively uniquely complex task among BCI experiments.
 Another important point is that one of the purposes of the study was to examine the evolving proficiency as the subject underwent successive sessions which could serve potential DL analysis.
-Some subjects also received training in mindfulness and meditation, as examination of the effects of this training on BCI proficiency was among the main interests of the study~\cite{stieger:mindfulness:20}.
+Some subjects also received training in mindfulness and meditation, as examination of the effects of this training on BCI proficiency was among the main interests of the study~\cite{stieger:mindfulness:20}. It is worth noting that this dataset suffers a major gender imbalance with 49 out of the 62 subjects being female. This might be the result of the aforementioned training in mindfulness and meditation being offered as a reward for participating in the study~\cite{data:stieger:21}.
 
-This, together with other metadata which is provided in great measure for the dataset, could be used to conduct various experiments in order to improve accuracy of the BCI using neural networks.
-In this study a BCI was already used (online) to allow the users to control the cursor and thus be able to include the subjects' response to the visual feedback in the data. Nevertheless, a more classical approach to discern the subjects' intention was implemented, one based on actual neurophysiological knowledge of the expected EEG signal. Therefore, it seems natural to attempt to use a DL based method and compare the outcomes.
-
-% TODO: What exactly were they using?
+This, together with other metadata, which is provided in great measure for the dataset, could be used to conduct various experiments in order to improve accuracy of the BCI using neural networks.
+The data was already classified online, using an autoregressive model with the maximum entropy method to allow the users to control the cursor and thus be able to include the subjects' response to the visual feedback in the data, therefore it seems natural to attempt to use a DL based method and compare the outcomes, possibly helping the subjects achieve better results.
 
 \section{Deep Learning on EEG Studies}
 
-% TODO: Title this and edit to fit here better but still relate to the DS
+This section provides examples of recent studies in a similar scope as this work, which means mostly using deep learning on EEG data.
 
-Recently, an extensive study has been conducted on the presented dataset by Zhu et al.~\cite{zhu:dl:bci:mi:22}, comparing state-of-the-art DL systems, conducting a within-subject analysis, as well as a cross-subject analysis. Only a limited subset of the Stieger-62 dataset was used by the authors in order to allow comparability to another dataset. Specifically, only one of three tasks was used --- moving the cursor from left to right, up-down movement and 2D movement were omitted. Additionally, only the first three sessions were used.
-The following algorithms were used: EEGNet (CNN), Deep and Shallow ConvNet, Multi-Branch 3D CNN (CNN with 3D tensor input, arranged by spatial position on the scalp) and ParaAtt (Parallel Self-Attention Network). In the within-subject analysis, a model was built for each subject, using recordings from the first two sessions for training (20\% of that for validation) and data from the third session for testing. All the algorithms have outperformed the classical BCI
-% TODO: what now?
-used for online evaluation in the within-subject analysis. However, only EEGNet surpassed the online evaluation in a statistically significant way, achieving accuracy of $75.47 \pm 10.8\%$, while online achieved $68.10 \pm 12.6\%$.\@
+\subsection{On the Deep Learning Models for EEG-Based Brain-Computer Interface Using Motor Imagery}
+
+This study by Zhu et al.~\cite{zhu:dl:bci:mi:22}, uses the Stieger-62 dataset, comparing state-of-the-art DL systems, conducting a within-subject analysis, as well as a cross-subject analysis. Only a limited subset of the dataset was used by the authors in order to allow comparability to another dataset. Specifically, only one of three tasks was used --- moving the cursor from left to right, up-down movement and 2D movement were omitted. Additionally, only the first three sessions from each user were included.
+The following algorithms were used: EEGNet (CNN), Deep and Shallow ConvNet, Multi-Branch 3D CNN (CNN with 3D tensor input, arranged by spatial position on the scalp) and ParaAtt (Parallel Self-Attention Network). In the within-subject analysis, a model was built for each subject, using recordings from the first two sessions for training (20\% of that for validation) and data from the third session for testing. All the algorithms have outperformed the maximum entropy model, used for online evaluation in the within-subject analysis. However, only EEGNet surpassed the online evaluation in a statistically significant way, achieving accuracy of $75.47 \pm 10.8\%$, while online achieved $68.10 \pm 12.6\%$.\@
 For the cross-subject analysis, a model was also built for each subject, only this time using the first three sessions from that one subject as the test set  and the first three sessions of the remaining subjects as the training set (again, 20\% for validation). According to the authors of the study, EEGNet performed the best again (better than all the other models in a statistically significant way), but they do not provide the specific numbers.
-This appears to be the only extensive study, conducted on the Stieger-62 dataset so far (and reasonably accessible to us), which leaves a decent amount of space for further studies while providing a possibility of comparison.
+This appears to be the only extensive study, conducted on the Stieger-62 dataset so far (and reasonably accessible to us) at the time of writing this, which leaves a decent amount of space for further studies while providing a possibility of comparison.
+
+\subsection{Applying Deep Learning for Decoding of EEG and BFV about Ischemic Stroke Patients and Visualization}
+
+This paper by Zhang and Wu~\cite{zhang:similar:20} aims to detect the Modified Rankin Scale (mRS)\footnote{Modified Rankin Scale is a scale for measuring the severity of disability of stroke patients. It ranges from 0 for no symptoms to 6 for death.} of ischemic stroke patients using EEG and blood flow velocity (BFV) data. They only use a small dataset of 15 subjects, 14 of which are ischemic stroke patients and one is healthy. They conducted experiments using a CNN, an LSTM and a CNN-LSTM hybrid. The hybrid achieved the best results with an accuracy of 99.68\%, which is a very promising result. It should be noted that on a patient in the state of dying the classifier failed, likely due to insufficient representation of that class in the dataset, but another reason might be a more chaotic behaviour of the brain in that state. As a result, the authors warn that this architecture might not be suitable for applications with rapidly changing signals.
 
 \chapter{Analysis}
 
-Ideas for future research in the application of neural networks on brain activity data are proposed in this chapter. Some of these will be selected for the final application. Firs new approaches on using specific data for training NNs in BCIs are suggested, then a more effective approach to storing data for experiments is discussed.
+Ideas for future research in the application of neural networks on brain activity data, mostly based on the unique features of the Stieger-62 dataset, are proposed in this chapter. Some of these will be selected for the final application. First, new approaches on using specific data for training NNs in BCIs are suggested, then a more effective approach to storing data for experiments is discussed.
 
-\section{Learning on Data from Trained Users}
+\section{Training on Data from Proficient Users}
 
 According to Stieger et al.~\cite{data:stieger:21,stieger:mindfulness:20} users can improve in BCI proficiency via training. The question is: Could learning on recordings from these advanced users produce better classifiers than simply using all the available data? And would these be effective for any user or only those of comparable abilities?
 
-This issue appears to be worth investigating via experimentation and the Med-62 dataset~\cite{data:stieger:21} could be very useful for that. Learning neural networks on this whole dataset and comparing the results to the same classifiers, learned on the later sessions only, could be  attempted. Also adding data augmentation to both of the experiments might produce interesting results --- the dataset is large enough, so that such a tool does not seem necessary, but it could still improve the accuracy, especially if only a part of the dataset is used.
+This issue appears to be worth investigating via experimentation and the Med-62 dataset~\cite{data:stieger:21} could be very useful for that. Training neural networks on this whole dataset and comparing the results to the same classifiers, learned on the later sessions only, could be  attempted. Also adding data augmentation to both of the experiments might produce interesting results --- the dataset is large enough, so that such a tool does not seem necessary, but it could still improve the accuracy, especially if only a part of the dataset is used.
 
 Additionally, similar experiments could be performed with focus on users who received training in meditation instead of or in addition to using the later sessions.
 
 \section{Metadata Specific Training}
 
-Another approach that could be attempted is trying to find a classifier which would best work for a specific group of subjects based on a shared quality, such as gender, age and task-specific subject traits (such as dominant hand in the case of motor imagery). This could be done by training an entire subject-specific classifier which in case of long term used systems, such as BCI-operated assistant devices, would probably still be worth the extra work, or by pre-training a general classifier and then adding specializations for each user.
+Another, slightly similar, approach that could be attempted is trying to find a classifier which would best work for a specific group of subjects based on a shared quality, such as gender, age and task-specific subject traits (such as dominant hand in the case of motor imagery). This could be done by training an entire subject-specific classifier which in case of long term used systems, such as BCI-operated assistant devices, would probably still be worth the extra work, or by pre-training a general classifier and then adding specializations for each user.
 
 This approach seems to require a large amount of data equipped with profound metadata and once again, the Med-62 dataset~\cite{data:stieger:21} appears appropriate for that. In addition, as using subsets of datasets reduces the volume of the data significantly, data augmentation would likely be a worthwhile tool for these methods.
 

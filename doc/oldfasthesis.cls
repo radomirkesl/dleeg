@@ -1,22 +1,22 @@
 % *****************************************************************************
 %
 %        FASThesis
-%        Bachelor's/Master's/Doctoral/Habilitation Thesis,
+%        (Bachelor's/Master's/Doctoral/Habilitation Thesis,
 %        Doctoral Dissertation & Seminar Work
-%        Class File/Document Template
+%        Class File/Document Template)
 %
 %        Faculty of Applied Sciences
 %        University of West Bohemia
 %
 %        LaTeX2e Class Definition
-%        Copyright (c) 2022-2024 Kamil Ekštein, Dept. of Computer Science
+%        Copyright (c) 2022-2023 Kamil Ekštein, Dept. of Computer Science
 %        and Engineering, Faculty of Applied Sciences, UWB
 %
-%        Version:  0.97 (Release Candidate 5)
-%        Encoding: UTF-8
-%        TeXer:    pdflatex
+%        Version:  0.7
+%		 Encoding: UTF-8
+%		 TeXer:    pdflatex
 %
-%        Last modification on 22-Apr-2024 by KE
+%        Last modification on 14-Apr-2023 by KE
 %
 % *****************************************************************************
 
@@ -31,34 +31,24 @@
 %	rig - doctoral dissertation theses (alias 'ddt')
 %	phd - doctoral dissertation
 %	hab - habilitation thesis
-%	oth - other type of thesis (headers must be defined manually)
 %	he - the author is male
-%	she - the author is female
-%	iso690alph - bibliography is typeset according to ISO 690, labels are alphanumeric shorts
-%	iso690auyr - bibliography is typeset according to ISO 690, labels are author-year pairs
-%	iso690numb - bibliography is typeset according to ISO 690, labels are numbers
-%	ftalph - bibliography is typeset according to FASThesis in-house consuetudinary rules
-%	pdf - the document will be stored in PDF (i.e. background graphics on the titlepage included)
-%	prn - the document is intended only for printing (i.e. black+white, no background graphics)
-%	nobggfx - do not use the background graphics on the front page (no background graphics)
-%	viewonly - the document will not be printed, just viewed on screen (==> no blank reverse side pages)
+%   she - the author is female
+%	iso690 -
+%	ftalph -
+%   pdf - the document will be stored in PDF (i.e. background graphics on the titlepage included)
+%   prn - the document is intended only for printing (i.e. black+white, no background graphics)
+%	nobggfx - do not use the background graphics on the front page
 %
 
 % _____________________________________________________________________________
 %
-%        CLASS FILE PROLOGUE
+%	     CLASS FILE PROLOGUE
 % _____________________________________________________________________________
 %
 
 \makeatletter
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{fasthesis}[2024/04/10 FAS UWB Thesis Class (Version 0.96)]
-
-% _____________________________________________________________________________
-%
-%        DEFINITIONS OF CONSTANTS
-% _____________________________________________________________________________
-%
+\ProvidesClass{fasthesis}[2023/04/14 FAS UWB Thesis Class (Version 0.7)]
 
 \def\c@czech{czech}
 \def\c@english{english}
@@ -72,12 +62,9 @@
 \def\c@rigorous{ddt}
 \def\c@doctoral{phd}
 \def\c@habilitation{hab}
-\def\c@other{oth}
 
 \def\c@fullcolor{pdf}
 \def\c@printonly{prn}
-\def\c@oneside{oneside}
-\def\c@twoside{twoside}
 
 \def\c@dept@kfy{kfy}
 \def\c@dept@kgm{kgm}
@@ -91,20 +78,8 @@
 \def\c@csnisonr{iso-numeric}	% "[1]" -- bibliography style according to ČSN ISO 690 by Michal Hoftich, FI MUNI
 \def\c@ftalpha{alphabetic}		% in-house FASThesis bibliography style (not conflicting with ČSN ISO 690)
 
-\def\c@yes{yes}
-\def\c@no{no}
-
-% _____________________________________________________________________________
-%
-%        DECLARATIONS OF CLASS OPTIONS
-% _____________________________________________________________________________
-%
-
-% options for the document language (\FASThesis@lang) 
 \DeclareOption{czech}{\let\FASThesis@lang\c@czech}
 \DeclareOption{english}{\let\FASThesis@lang\c@english}
-
-% options for the document type (\FASThesis@type) 
 \DeclareOption{sem}{\let\FASThesis@type\c@semestral}
 \DeclareOption{bc}{\let\FASThesis@type\c@bachelors}
 \DeclareOption{ba}{\let\FASThesis@type\c@bachelors}
@@ -115,27 +90,17 @@
 \DeclareOption{ddt}{\let\FASThesis@type\c@rigorous}
 \DeclareOption{phd}{\let\FASThesis@type\c@doctoral}
 \DeclareOption{hab}{\let\FASThesis@type\c@habilitation}
-\DeclareOption{oth}{\let\FASThesis@type\c@other}
-
-% options for the document gender (\FASThesis@sex) <== affects only the wording of disclaimers
 \DeclareOption{he}{\let\FASThesis@sex\c@maleauthor}
 \DeclareOption{she}{\let\FASThesis@sex\c@femaleauthor}
-
-% options for the document finalization
 \DeclareOption{pdf}{\let\FASThesis@style\c@fullcolor}
 \DeclareOption{prn}{\let\FASThesis@style\c@printonly}
 \DeclareOption{nobggfx}{\def\FASThesis@nobggfx{}}
-
-\let\FASThesis@print@sides\c@twoside
-\DeclareOption{viewonly}{\let\FASThesis@print@sides\c@oneside}
-
-% options for the bibliography/reference style (\FASThesis@bibliography@style)
 \DeclareOption{iso690alph}{\let\FASThesis@bibliography@style\c@csnisoal}
 \DeclareOption{iso690auyr}{\let\FASThesis@bibliography@style\c@csnisoay}
 \DeclareOption{iso690numb}{\let\FASThesis@bibliography@style\c@csnisonr}
 \DeclareOption{ftalph}{\let\FASThesis@bibliography@style\c@ftalpha}
 
-% options for the departments (\FASThesis@dept) of the Faculty of Applied Sciences
+% options for the departments of the Faculty of Applied Sciences
 \DeclareOption{kfy}{\let\FASThesis@dept\c@dept@kfy}
 \DeclareOption{kgm}{\let\FASThesis@dept\c@dept@kgm}
 \DeclareOption{kiv}{\let\FASThesis@dept\c@dept@kiv}
@@ -143,29 +108,26 @@
 \DeclareOption{kma}{\let\FASThesis@dept\c@dept@kma}
 \DeclareOption{kme}{\let\FASThesis@dept\c@dept@kme}
 
-% default options
 \ExecuteOptions{czech, kiv, ba, he, iso690alph, pdf}
 \ProcessOptions\relax
 
 % _____________________________________________________________________________
 %
-%        BASE CLASS LOADING
+%	     BASE CLASS LOADING
 %        AND PACKAGE SETUPS
 % _____________________________________________________________________________
 %
 
-% the base class loading
-\LoadClass[12pt, a4paper, \FASThesis@print@sides]{memoir}
-% font, font manipulation & encoding packages
+\LoadClass[12pt, a4paper]{memoir}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
-\RequirePackage[\FASThesis@lang]{babel}
-% the recommended font that fits best the Unified Visual Style of UWB/FAS is 'cochineal'
-\RequirePackage[p, cochineal]{newtx} % <== applicable are also: libertine, ebgaramond, vvarbb
-\RequirePackage[cochineal]{newtxmath}
-\RequirePackage[final, protrusion=true, kerning=true, babel=true, stretch=10, shrink=10, nopatch=item]{microtype} 
 
-% conditional loading of the package for the czech quotes
+% font & encoding packages
+\RequirePackage[cochineal]{newtx} % <== applicable: libertine, ebgaramond, cochineal, vvarbb
+\RequirePackage{newtxtt, newtxmath}
+\RequirePackage[\FASThesis@lang]{babel}
+\RequirePackage[final, protrusion=true, kerning=true, babel=true, stretch=10, shrink=10, nopatch=item]{microtype} %expansion=true, 
+%\SetProtrusion[factor=100]{encoding={*}, family={*}, size={-}}{}
 \ifx\FASThesis@lang\c@czech%
 	\RequirePackage{csquotes}
 \fi%
@@ -182,9 +144,8 @@
 \RequirePackage[usenames, dvipsnames]{xcolor}
 \RequirePackage{eso-pic}
 \RequirePackage[most]{tcolorbox}
-\RequirePackage[nolinks, final]{qrcode}
 
-% modifications of the page geometry
+% modification of the page geometry
 \newdimen\FASThesis@margin@left
 \FASThesis@margin@left=37mm
 \newdimen\FASThesis@margin@right
@@ -203,9 +164,9 @@
 \RequirePackage{tikz}
 \usetikzlibrary{positioning}
 
-% hyperref package, so that we can typeset active URLs
-\RequirePackage[hidelinks, unicode]{hyperref}
-\def\UrlFont{\ttfamily\small}
+% hyperref, so that we can typeset active URLs
+\RequirePackage[hidelinks]{hyperref}
+\def\UrlFont{\ttzfamily\small}
 \let\UrlSpecialsOld\UrlSpecials
 \def\UrlSpecials{\UrlSpecialsOld\do\/{\Url@slash}\do\_{\Url@underscore}}
 \def\Url@slash{\@ifnextchar/{\kern-.11em\mathchar47\kern-.2em}%
@@ -224,13 +185,13 @@
 
 % set the active language at the very beginning of the document
 \expandafter\AtBeginDocument%
-	\expandafter{\expandafter\selectlanguage%
+	\expandafter{%
+	\expandafter\selectlanguage%
 	\expandafter{\FASThesis@lang}}
 
 % _____________________________________________________________________________
 %
-%        DEFINITIONS OF THE
-%        BASIC DOCUMENT COLOURS
+%	     DEFINITIONS OF COLOURS
 % _____________________________________________________________________________
 %
 
@@ -244,27 +205,48 @@
 \definecolor{FASThesis@UWBBlue}{cmyk}{0.96, 0.69, 0, 0}
 \definecolor{FASThesis@UXConBlue}{cmyk}{0.89, 0.83, 0, 0}
 \definecolor{FASThesis@UXConGreen}{cmyk}{0.99, 0, 0.93, 0}
-\definecolor{FASThesis@ImportantColor}{cmyk}{0, 1.0, 1.0, 0} % <== the colour used in the 'important' environment
+\definecolor{FASThesis@ImportantColor}{cmyk}{0, 1.0, 1.0, 0}
 
 % _____________________________________________________________________________
 %
-%        DEFINITIONS OF SIZES AND MEASURES
+%	     DEFINITIONS OF SIZES AND MEASURES
 % _____________________________________________________________________________
 %
 
-% general size constants
 \def\FASThesis@golden@ratio{0.61803398875023664980396737456965}%
-
-% page component sizes
 \newdimen\FASThesis@runninghead@rule@length%
 \FASThesis@runninghead@rule@length=\dimexpr\FASThesis@golden@ratio\textwidth\relax%
 
+% _____________________________________________________________________________
+%
+%	     DEFINITIONS OF FONTS
+% _____________________________________________________________________________
+%
+
+% check whether the LaTeX source is compiled by pdfLaTeX,
+% if yes, setup the \ifpdflatex conditional
+\newif\ifpdflatex%
+	\ifx\pdfoutput\undefined%
+	\else%
+		\ifx\pdfoutput\relax%
+		\else%
+			\ifcase\pdfoutput\else\pdflatextrue\fi%
+		\fi%
+	\fi%
+
+% if the LaTeX source is compiled by pdfLaTeX, add the map
+% file for the GTAmerica font
+\ifpdflatex%
+	\typeout{* FASThesis>> pdflatex detected. Adding the map file for the font GTAmerica.}
+	\pdfmapfile{+GTAmerica.map}%
+\fi%
+
 % font sizes
 \newdimen\FASThesis@title@size
-\FASThesis@title@size=28pt
+\FASThesis@title@size=25pt %30pt %25pt
 
 \newdimen\FASThesis@author@size
-\FASThesis@author@size=21pt
+\FASThesis@author@size=25pt
 
 \newdimen\FASThesis@type@size
 \FASThesis@type@size=25pt
@@ -284,30 +266,6 @@
 \newdimen\FASThesis@subsubsection@size
 \FASThesis@subsubsection@size=14pt
 
-% _____________________________________________________________________________
-%
-%        DEFINITIONS OF FONTS
-% _____________________________________________________________________________
-%
-
-% check whether the LaTeX source is compiled by pdfLaTeX,
-% if yes, setup the \ifpdflatex conditional
-\newif\ifpdflatex%
-	\ifx\pdfoutput\undefined%
-	\else%
-		\ifx\pdfoutput\relax%
-		\else%
-			\ifcase\pdfoutput\else\pdflatextrue\fi%
-		\fi%
-	\fi%
-
-% if the LaTeX source is compiled by pdfLaTeX, add the map
-% file for the 'GTAmerica' font
-\ifpdflatex%
-	\typeout{* FASThesis>> pdflatex detected. Adding the map file for the font 'GTAmerica'.}
-	\pdfmapfile{+GTAmerica.map}%
-\fi%
-
 % fonts used on the front page and front matter
 \font\GTAmerica@Title=GTAmerica-CondensedBold-lf-t1 at \FASThesis@title@size
 \font\GTAmerica@Author=GTAmerica-CondensedRegular-lf-t1 at \FASThesis@author@size
@@ -317,8 +275,8 @@
 \font\GTAmerica@FPAuxBf=GTAmerica-CondensedBold-lf-t1 at \dimexpr\FASThesis@place@size + 2pt\relax
 
 % fonts used in the text
-\font\GTAmericaBfChapterNum=GTAmerica-CondensedBold-lf-t1 at 52pt
-\font\GTAmericaBfChapter=GTAmerica-CondensedBold-lf-t1 at \FASThesis@chapter@size
+\font\GTAmericaBfChapterNum=GTAmerica-CondensedBold-lf-t1 at 52pt %25pt
+\font\GTAmericaBfChapter=GTAmerica-CondensedBold-lf-t1 at \FASThesis@chapter@size %25pt
 \font\GTAmericaBfSection=GTAmerica-CondensedBold-lf-t1 at \FASThesis@section@size
 \font\GTAmericaRgSection=GTAmerica-CondensedRegular-lf-t1 at \FASThesis@section@size
 \font\GTAmericaBfSubsection=GTAmerica-CondensedBold-lf-t1 at \FASThesis@subsection@size
@@ -333,11 +291,11 @@
 
 % _____________________________________________________________________________
 %
-%        LANGUAGE-DEPENDENT SETTINGS
+%	     LANGUAGE-DEPENDENT SETTINGS
 % _____________________________________________________________________________
 %
 
-\ifx\FASThesis@lang\c@czech% <== the work is written in the *CZECH* language
+\ifx\FASThesis@lang\c@czech% << the work is written in the *CZECH* language
 	\def\FASThesis@university{Západočeská univerzita v Plzni}
 	\def\FASThesis@faculty{Fakulta aplikovaných věd}
 	\ifx\FASThesis@dept\c@dept@kfy%
@@ -371,21 +329,9 @@
 		\def\FASThesis@type@text{Diplomová práce}
 		\def\FASThesis@type@text@acc{diplomovou práci}
 	\fi
-	\ifx\FASThesis@type\c@rigorous%
-		\def\FASThesis@type@text{Teze disertační práce}
-		\def\FASThesis@type@text@acc{tezi disertační práce}
-	\fi
 	\ifx\FASThesis@type\c@doctoral%
 		\def\FASThesis@type@text{Disertační práce}
 		\def\FASThesis@type@text@acc{disertační práci}
-	\fi
-	\ifx\FASThesis@type\c@habilitation%
-		\def\FASThesis@type@text{Habilitační práce}
-		\def\FASThesis@type@text@acc{habilitační práci}
-	\fi
-	\ifx\FASThesis@type\c@other%
-		\def\FASThesis@type@text{Práce}
-		\def\FASThesis@type@text@acc{práci}
 	\fi
 	
 	\def\FASThesis@supervisor@label{Vedoucí práce}
@@ -435,14 +381,9 @@
 	
 	\renewcommand{\lstlistingname}{Zdrojový kód}
 	\def\FASThesis@listing@label{Výpis}
-	
-	% language-dependent text formatting (for Czech) in the traditional
-	% Czech paragraph skipping is wanted ==> uncomment the following 2 lines
-	%\setlength{\parindent}{2em}
-	%\setlength{\parskip}{0pt}
 \else\relax\fi%
 
-\ifx\FASThesis@lang\c@english% <== the work is written in the *ENGLISH* language
+\ifx\FASThesis@lang\c@english% << the work is written in the *ENGLISH* language
 	\def\FASThesis@university{University of West Bohemia}
 	\def\FASThesis@faculty{Faculty of Applied Sciences}
 	\ifx\FASThesis@dept\c@dept@kfy%
@@ -473,17 +414,8 @@
 	\ifx\FASThesis@type\c@masters%
 		\def\FASThesis@type@text{Master's Thesis}
 	\fi
-	\ifx\FASThesis@type\c@rigorous%
-		\def\FASThesis@type@text{State of the Art and Concepts of Ph.D. Thesis}
-	\fi
 	\ifx\FASThesis@type\c@doctoral%
 		\def\FASThesis@type@text{Doctoral Dissertation}
-	\fi
-	\ifx\FASThesis@type\c@habilitation%
-		\def\FASThesis@type@text{Habilitation Thesis}
-	\fi
-	\ifx\FASThesis@type\c@other%
-		\def\FASThesis@type@text{Thesis}
 	\fi
 	
 	\def\FASThesis@supervisor@label{Thesis advisor}	
@@ -500,11 +432,11 @@
 	\def\FASThesis@auth@statement@text{I hereby declare that this \FASThesis@type@text{} is completely
 		my own work	and that I used only the cited sources, literature, and other resources. This thesis
 		has not been used to obtain another or the same academic degree.
-		\newline\par\noindent%
+		\newline\par\noindent
 		I acknowledge that my thesis is subject to the rights and obligations arising from
 		Act No. 121/2000 Coll., the Copyright Act as amended, in particular the fact that
 		the University of West Bohemia has the right to conclude a licence agreement for
-		the use of this thesis as a school work pursuant to Section 60(1) of the Copyright Act.}
+		the use of this thesis as a school work pursuant to Section 60(1) of the Copyright Act.}%
 	
 	\def\FASThesis@trademark@statement{The names of products, technologies,
 	services, applications, companies, etc. used in the text may be trademarks or
@@ -534,19 +466,16 @@
 
 % _____________________________________________________________________________
 %
-%        LOCALLY USED COMMANDS & CONSTANTS
-%        (PRIVATES)
+%	     LOCALLY USED COMMANDS
 % _____________________________________________________________________________
 %
 
-\let\FASThesis@frontmatter@aux@content\empty%
-
 \long\gdef\@calc@trim< #1 >\@/< #2 >\@/< #3 >\@/< #4 >\@/< #5 >\@/< #6 >\@/< #7 >\@/< #8 >\@/< #9 >\@nihil{%
-	\ifcase\numexpr2#3#8\relax\or#2\or#7\or#5\or#1\or#1\fi%
+    \ifcase\numexpr2#3#8\relax\or#2\or#7\or#5\or#1\or#1\fi%
 }
 
 \long\gdef\trim#1{%
-	\@calc@trim< #1 >\@/< #1>\@/< - >\@/< + >\@/< ? >\@/<#1 >\@/<#1>\@/< 0 >\@/< 2 >\@/< 1 >\@/< 3 >\@/< 2 >\@/< ! >\@nihil%
+    \@calc@trim< #1 >\@/< #1>\@/< - >\@/< + >\@/< ? >\@/<#1 >\@/<#1>\@/< 0 >\@/< 2 >\@/< 1 >\@/< 3 >\@/< 2 >\@/< ! >\@nihil%
 }
 
 \def\FASThesis@colortext#1{%
@@ -562,41 +491,55 @@
 }
 
 \def\FASThesis@section@num#1{%
+	%{\fontsize{\FASThesis@section@size}{\FASThesis@section@size}\selectfont%
+	%{\GTAmericaRgSection\FASThesis@colortext{#1}}}%
 	\fontsize{\FASThesis@section@size}{1.0\FASThesis@section@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@section@title#1{%
+	%{\fontsize{\FASThesis@section@size}{\FASThesis@section@size}\selectfont%
+	%{\GTAmericaBfSection\FASThesis@colortext{#1}}}%
 	\fontsize{\FASThesis@section@size}{1.0\FASThesis@section@size}\usefont{T1}{GTAmerica-LF}{bc}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@subsection@num#1{%
+	%{\fontsize{\FASThesis@subsection@size}{\FASThesis@subsection@size}\selectfont%
+	%{\GTAmericaRgSubsection\FASThesis@colortext{#1}}}%
 	\fontsize{\FASThesis@subsection@size}{1.0\FASThesis@subsection@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@subsection@title#1{%
+	%{\fontsize{\FASThesis@subsection@size}{\FASThesis@subsection@size}\selectfont%
+	%{\GTAmericaBfSubsection\FASThesis@colortext{#1}}}%
 	\fontsize{\FASThesis@subsection@size}{1.0\FASThesis@subsection@size}\usefont{T1}{GTAmerica-LF}{bc}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@subsubsection@num#1{%
+	%{\fontsize{\FASThesis@subsubsection@size}{\FASThesis@subsubsection@size}\selectfont%
+	%{\GTAmericaRgSubsubsection\FASThesis@colortext{#1}}}%
 	\fontsize{\FASThesis@subsubsection@size}{1.0\FASThesis@subsubsection@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@subsubsection@title#1{%
+	%{\fontsize{\FASThesis@subsubsection@size}{\FASThesis@subsubsection@size}\selectfont%
+	%{\GTAmericaBfSubsubsection\FASThesis@colortext{#1}}}%
 	\fontsize{\FASThesis@subsubsection@size}{1.0\FASThesis@subsubsection@size}\usefont{T1}{GTAmerica-LF}{bc}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@paragraph@num#1{%
+	%{\GTAmericaRg\FASThesis@colortext{#1}}%
 	\fontsize{\f@size}{1.0\f@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
 	\FASThesis@colortext{#1}%
 }
 
 \def\FASThesis@paragraph@title#1{%
+	%{\GTAmericaBf\FASThesis@colortext{#1}}%
 	\fontsize{\f@size}{1.0\f@size}\usefont{T1}{GTAmerica-LF}{bc}{n}%
 	\FASThesis@colortext{#1}%
 }
@@ -619,7 +562,7 @@
 			prosince\else%
 			srpence
 		\fi%
-	\fi%
+	\fi
 	%
 	\ifx\FASThesis@lang\c@english%
 		\ifcase#1%
@@ -643,60 +586,45 @@
 
 % _____________________________________________________________________________
 %
-%        MODIFICATIONS/REDEFINITIONS OF
-%        THE STANDARD LATEX/MEMOIR BEHAVIOUR
+%	     STANDARD MODIFICATIONS
 % _____________________________________________________________________________
 %
 
-\linespread{1.1} % <== this has probably 
-\renewcommand*{\verbatim@font}{\ttfamily}
+\linespread{1.1} % !!! TODO !!! ?1.1? ?1.0?
+\renewcommand*{\verbatim@font}{\ttzfamily\small}
 
 % correct Czech double quotes
-\ifx\uv\undefined%
-	\newcommand{\uv}[1]{\quotedblbase{#1}\textquotedblleft}%
-\fi%
+\ifx\uv\undefined
+	\newcommand{\uv}[1]{\quotedblbase{#1}\textquotedblleft}
+\fi
 
-\frenchspacing%
+\frenchspacing
 
-\global\let\part\relax% <== the `\part' command can NOT be used throughout the document
+\global\let\part\relax% << the \part command can NOT be used throughout the document
 
 % if the 'mathptmx' package is used for the Times New Roman font,
-% these additional kerning pairs must be defined (thus, uncomment):
+% these additional kerning pairs must be defined:
 % \SetExtraKerning[unit=space]{encoding={*}, series={*}, size={*}}{
 %	ď = {, -750},
 %	ť = {, -850}
 % }
 
 \def\author#1#2#3#4{%
-	\def\@author{#1~#2}%
-	\def\FASThesis@auth@firstname{#1}%
-	\def\FASThesis@auth@surname{#2}%
-	\def\FASThesis@auth@frontdegs{#3}%
-	\def\FASThesis@auth@behinddegs{#4}%
+	\def\@author{#1~#2}
+	\def\FASThesis@auth@firstname{#1}
+	\def\FASThesis@auth@surname{#2}
+	\def\FASThesis@auth@frontdegs{#3}	
+	\def\FASThesis@auth@behinddegs{#4}
 }
 
 \def\supervisor#1{%
-	\renewcommand{\FASThesis@supervisor}{#1}%
+	\renewcommand{\FASThesis@supervisor}{#1}
 }
 
 \newcommand{\FASThesis@day}{\the\day}
 \newcommand{\FASThesis@month}{\the\month}
 \newcommand{\FASThesis@year}{\the\year}
 \newcommand{\FASThesis@signature@place}{V Plzni}
-\catcode`\&=12 % changing temporarily the catcode for `&' so that it can be used as a normal character in an URL
-\newcommand{\FASThesis@qrcode@baseurl}{https://portal.zcu.cz/StagPortletsJSR168/CleanUrl?urlid=prohlizeni-prace-detail&praceIdno=}
-\catcode`\&=4 % changing the catcode for `&' back to column delimiter
-\newcommand{\FASThesis@qrcode@workid}{\empty}
-
-\def\setqrcodebaseurl#1{%
-	\catcode`\&=12%
-	\renewcommand{\FASThesis@qrcode@baseurl}{#1}%
-	\catcode`\&=4%
-}
-
-\def\stagworkid#1{%
-	\renewcommand{\FASThesis@qrcode@workid}{#1}%
-}
 
 \def\signdate#1#2#3#4{%
 	\def\tempempty{}%
@@ -711,24 +639,24 @@
 }
 
 \ifx\FASThesis@lang\c@czech%
-	\newcommand{\FASThesis@assignment@pdf}{img/assgn-cz.pdf}%
-\fi%
+	\newcommand{\FASThesis@assignment@pdf}{img/assgn-cz.pdf}
+\fi
 \ifx\FASThesis@lang\c@english%
-	\newcommand{\FASThesis@assignment@pdf}{img/assgn-en.pdf}%
-\fi%
+	\newcommand{\FASThesis@assignment@pdf}{img/assgn-en.pdf}
+\fi
 \def\assignment#1{%
-	\renewcommand{\FASThesis@assignment@pdf}{#1}%
+	\renewcommand{\FASThesis@assignment@pdf}{#1}
 }
 
 \renewcommand{\abstract}[3][\FASThesis@abstract@label@secondarylang]{%
-	\def\FASThesis@abstract@label@secondarylang@typeset{#1}%
-	\def\FASThesis@abstract@text@primarylang{#2}%
-	\def\FASThesis@abstract@text@secondarylang{#3}%
+	\def\FASThesis@abstract@label@secondarylang@typeset{#1}
+	\def\FASThesis@abstract@text@primarylang{#2}
+	\def\FASThesis@abstract@text@secondarylang{#3}
 }
 
 \newcommand{\FASThesis@acknowledgement@text}{}
 \newcommand{\acknowledgement}[1]{%
-	\renewcommand\FASThesis@acknowledgement@text{#1}%
+	\renewcommand\FASThesis@acknowledgement@text{#1}
 }
 
 \newcommand{\keywords}[1]{%
@@ -736,15 +664,14 @@
 	\StrSubstitute[0]{#1}{, }{ \textbullet{} }[\FASThesis@temp@kwa]%
 	\expandarg%
 	\StrSubstitute[0]{\FASThesis@temp@kwa}{,}{ \textbullet{} }[\FASThesis@temp@kwb]%
-	\renewcommand{\FASThesis@keywords}{\FASThesis@temp@kwb}%
+	\renewcommand{\FASThesis@keywords}{\FASThesis@temp@kwb}
 }
 
 \newcommand{\subject}[1]{%
-	\renewcommand{\FASThesis@subject}{#1}%
+	\renewcommand{\FASThesis@subject}{#1}
 }
 
-% setting the sectioning depth for the base memoir class to paragraphs
-\setsecnumdepth{paragraph} 
+\setsecnumdepth{paragraph}% << set the sectioning depth for the base memoir class to paragraphs
 \maxtocdepth{subsection}
 
 \renewcommand{\tableofcontents}{%
@@ -759,7 +686,7 @@
 	\chapter*{\FASThesis@listoffigures@label}{%
 	\def\leftmark{\FASThesis@listoffigures@label}%
 	\def\rightmark{\FASThesis@listoffigures@label}%	
-	\addcontentsline{toc}{chapter}{\FASThesis@listoffigures@label}%
+	\addcontentsline{toc}{chapter}{\FASThesis@listoffigures@label}
 	\@starttoc{lof}%
 	\newpage}%
 }
@@ -768,7 +695,7 @@
 	\chapter*{\FASThesis@listoftables@label}{%
 	\def\leftmark{\FASThesis@listoftables@label}%
 	\def\rightmark{\FASThesis@listoftables@label}%		
-	\addcontentsline{toc}{chapter}{\FASThesis@listoftables@label}%
+	\addcontentsline{toc}{chapter}{\FASThesis@listoftables@label}
 	\@starttoc{lot}%
 	\newpage}%
 }
@@ -777,15 +704,13 @@
 	\chapter*{\FASThesis@listoflistings@label}{%
 	\def\leftmark{\FASThesis@listoflistings@label}%
 	\def\rightmark{\FASThesis@listoflistings@label}%			
-	\addcontentsline{toc}{chapter}{\FASThesis@listoflistings@label}%
+	\addcontentsline{toc}{chapter}{\FASThesis@listoflistings@label}
 	\@starttoc{lol}%
 	\newpage}%
 }
 
-% _____________________________________________________________________________
 %
-%        HEADER & FOOTER (PAGESTYLE) STYLING
-% _____________________________________________________________________________
+%        Styling of running headers and footers
 %
 
 \renewcommand{\makeheadrule}[3]{%
@@ -804,6 +729,12 @@
 	}%
 }
 
+% _____________________________________________________________________________
+%
+%	     HEADER & FOOTER (PAGESTYLE) STYLING
+% _____________________________________________________________________________
+%
+
 \makepagestyle{fasthesisheadings}
 \makeheadfootruleprefix{fasthesisheadings}{%
 	\ifx\FASThesis@style\c@fullcolor%
@@ -811,31 +742,21 @@
 	\else%
 		\color{black}%
 	\fi%
-	\ifx\FASThesis@print@sides\c@oneside%
-		\raggedleft%
-	\else%
-		\relax%
-	\fi%
 }{\color{black}}
 \makeheadrule{fasthesisheadings}{\FASThesis@runninghead@rule@length}{%
 	\ifx\FASThesis@style\c@fullcolor 3\else 1\fi\normalrulethickness%
 }
 \makeheadposition{fasthesisheadings}{flushright}{flushleft}{}{}
-\ifx\FASThesis@print@sides\c@oneside%
-	\makeevenhead{fasthesisheadings}{}{}{\small\itshape\rightmark}%
-	\makeoddhead{fasthesisheadings}{}{}{\small\itshape\rightmark}%
-\else%
-	\makeevenhead{fasthesisheadings}{\small\itshape\leftmark}{}{}%
-	\makeoddhead{fasthesisheadings}{}{}{\small\itshape\rightmark}%
-\fi%
+\makeevenhead{fasthesisheadings}{\small\itshape\leftmark}{}{}
+\makeoddhead{fasthesisheadings}{}{}{\small\itshape\rightmark}
 \makeevenfoot{fasthesisheadings}{\normalcolor\small\thepage}{}{} 
 \makeoddfoot{fasthesisheadings}{}{}{\normalcolor\small\thepage}
 \makepsmarks{fasthesisheadings}{
 	\nouppercaseheads
-	\createmark{chapter}{both}{shownumber}{}{ \ }
-	\createmark{section}{right}{shownumber}{}{ \ }
-	\createmark{subsection}{right}{shownumber}{}{ \ }
-	\createmark{subsubsection}{right}{shownumber}{}{ \ }
+	\createmark{chapter}{both}{shownumber}{}{. \ } % \@chapapp\
+	\createmark{section}{right}{shownumber}{}{. \ }
+	\createmark{subsection}{right}{shownumber}{}{. \ }
+	\createmark{subsubsection}{right}{shownumber}{}{. \ }
 	\createplainmark{toc}{both}{\contentsname}
 	\createplainmark{lof}{both}{\listfigurename}
 	\createplainmark{lot}{both}{\listtablename}
@@ -855,24 +776,22 @@
 
 % _____________________________________________________________________________
 %
-%        TITLE PAGE, FRONT MATTER & BACK MATTER STYLING
+%	     TITLE PAGE & FRONT MATTER STYLING
 % _____________________________________________________________________________
 %
 
 \newlength{\FASThesis@titlebox@width}
 \newlength{\FASThesis@titlebox@height}
-\newsavebox{\FASThesis@backpage@sign}
+\newsavebox{\FASThesis@backpage@img}
 
 \renewcommand{\maketitle}{%
-	%
-	%	MAIN TITLE
-	%
 	{% -- the whole title page is a local environment (the modifications are not propagated)
 	\enlargethispage{20mm}
 	\addtolength{\topmargin}{-6mm}
 	\thispagestyle{empty}
 
 	\begin{titlingpage} % memoir.cls
+	%\begin{titlepage} << book/report.cls
 		% include (if the class option 'pdf' was used) the background graphics
 		\ifx\FASThesis@style\c@fullcolor%
 			\ifx\FASThesis@nobggfx\empty\relax\else%
@@ -888,13 +807,11 @@
 		\newsavebox{\FASThesis@titlebox}
 		\savebox{\FASThesis@titlebox}{%
 			\parbox{\textwidth}{%
-				\let\FASThesis@flag@in@maintitle\c@yes%
 				\raggedright%
-				\fontsize{\FASThesis@title@size}{1.0\FASThesis@title@size}\usefont{T1}{GTAmerica-LF}{bc}{n}%
-				\textcolor{white}{\@title}\\[.666\baselineskip]% tiny clues are hidden everywhere, on the other hand this is just 2/3
-				\fontsize{\FASThesis@author@size}{1.0\FASThesis@author@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
-				\textcolor{white}{\@author}%
-				\let\FASThesis@flag@in@maintitle\c@no%
+				\fontsize{\FASThesis@title@size}{\baselineskip}\selectfont%
+				\GTAmerica@Title\textcolor{white}{\@title}\\[1.3\baselineskip]%
+				\fontsize{\FASThesis@author@size}{\baselineskip}\selectfont%
+				\GTAmerica@Author\textcolor{white}{\@author}%
 			}%
 		}
 		
@@ -907,31 +824,21 @@
 		\newdimen\FASThesis@auxdim@lx%
 		\FASThesis@auxdim@lx=\dimexpr.5\FASThesis@titlebox@width+\FASThesis@margin@left\relax%
 		\newdimen\FASThesis@auxdim@ly%
-		\FASThesis@auxdim@ly=\dimexpr1.3\FASThesis@titlebox@height\relax%
+		\FASThesis@auxdim@ly=\dimexpr1.5\FASThesis@titlebox@height\relax%
 		
 		\begin{tikzpicture}[remember picture, overlay]
-			\node[yshift=-\dimexpr0.666\paperheight\relax] at (current page.north west) {%
+			\node[yshift=-\dimexpr0.631\paperheight\relax] at (current page.north west) {%
 				\begin{tikzpicture}[remember picture, overlay]
-					\draw (\FASThesis@auxdim@lx, \dimexpr2.6\FASThesis@titlebox@height+1.8\baselineskip\relax)%
+					\draw (\FASThesis@auxdim@lx, \dimexpr3.0\FASThesis@titlebox@height+2.0\baselineskip\relax)% +1.5
 						node{\hbox to \textwidth{%
-							\GTAmerica@Type%
-							\ifx\FASThesis@style\c@fullcolor\color{FASThesis@FASColor}\else\color{black}\fi%
-							\FASThesis@type@text\hfil}%
-						};
-					% horizontal bar (background for the title) on the title page
-					\ifx\FASThesis@style\c@fullcolor%
-						\fill[FASThesis@FASColor] (0, 0) rectangle (\paperwidth, \dimexpr2.6\FASThesis@titlebox@height\relax);% 3.0
-					\else%
-						\fill[black] (0, 0) rectangle (\paperwidth, \dimexpr2.6\FASThesis@titlebox@height\relax);
-					\fi%
-					% typeset the main title box
+							\GTAmerica@Type\textcolor{FASThesis@FASColor}{\FASThesis@type@text}\hfil}};
+					\fill[FASThesis@FASColor] (0, 0) rectangle (\paperwidth, \dimexpr3.0\FASThesis@titlebox@height\relax);
 					\draw (\FASThesis@auxdim@lx, \FASThesis@auxdim@ly)%
 						node{\usebox{\FASThesis@titlebox}};
-					% typeset the place and year
 					\draw (\FASThesis@auxdim@lx, -77mm)%
 						node{\hbox to \textwidth{%
-							\GTAmerica@Place\ifx\FASThesis@style\c@fullcolor\color{FASThesis@FASColor}\else\color{black}\fi%
-								\MakeUppercase{\FASThesis@place}\hfil{}\FASThesis@year}};
+							\GTAmerica@Place\textcolor{FASThesis@FASColor}%
+								{\MakeUppercase{\FASThesis@place}\hfil{}\FASThesis@year}}};
 				\end{tikzpicture}%
 			};%
 		\end{tikzpicture}
@@ -939,36 +846,28 @@
 		% logo
 		\noindent%
 		\ifx\FASThesis@lang\c@czech
-			\ifx\FASThesis@style\c@fullcolor\includegraphics[height=25.2mm]{img/\FASThesis@dept-cmyk-cz}%
-			\else\includegraphics[height=25.2mm]{img/\FASThesis@dept-black-cz}%
-			\fi%
+			\includegraphics[height=25.2mm]{img/\FASThesis@dept-cmyk-cz}
 		\fi
 		\ifx\FASThesis@lang\c@english
-			\ifx\FASThesis@style\c@fullcolor\includegraphics[height=25.2mm]{img/\FASThesis@dept-cmyk-en}%
-			\else\includegraphics[height=25.2mm]{img/\FASThesis@dept-black-en}%
-			\fi%
+			\includegraphics[height=25.2mm]{img/\FASThesis@dept-cmyk-en}
 		\fi
 	\end{titlingpage} % memoir.cls
+	%\end{titlepage} << book/report.cls
 	%
-	%	BASTARD TITLE
 	%
-	\enlargethispage{20mm}
-	\thispagestyle{empty}
-	
+	%
 	\begin{titlingpage} % << bastard title (b/w only)
 		% setting the title and author box
 		\newsavebox{\FASThesis@titlebox@bw}
 		\savebox{\FASThesis@titlebox@bw}{%
 			\parbox{\textwidth}{%
-				\let\FASThesis@flag@in@maintitle\c@yes%
 				\raggedright%
-				\fontsize{\FASThesis@title@size}{1.0\FASThesis@title@size}\usefont{T1}{GTAmerica-LF}{bc}{n}%				
-				\@title\\[.666\baselineskip]%
-				\fontsize{\FASThesis@author@size}{1.0\FASThesis@author@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
+				\fontsize{\FASThesis@title@size}{\baselineskip}\selectfont% %TODO: \usefont
+				\GTAmerica@Title\@title\\[1.3\baselineskip]% 
+				\fontsize{.833\FASThesis@author@size}{\FASThesis@author@size}\usefont{T1}{GTAmerica-LF}{c}{n}%
 				\ifx\FASThesis@auth@frontdegs\empty\relax\else\FASThesis@auth@frontdegs~\fi%
 				\@author%
 				\ifx\FASThesis@auth@behinddegs\empty\relax\else,~\FASThesis@auth@behinddegs\fi%
-				\let\FASThesis@flag@in@maintitle\c@no%
 			}%
 		}
 		
@@ -979,29 +878,21 @@
 		\newdimen\FASThesis@auxdim@lx%
 		\FASThesis@auxdim@lx=\dimexpr.5\FASThesis@titlebox@width+\FASThesis@margin@left\relax%
 		\newdimen\FASThesis@auxdim@ly%
-		\FASThesis@auxdim@ly=\dimexpr1.3\FASThesis@titlebox@height\relax%
-		
-		\def\tempsupervisorlabel{~}%
-		\def\tempsupervisor{~}%
-		\ifx\FASThesis@type\c@semestral\relax\else%
-		\ifx\FASThesis@type\c@habilitation\relax\else%
-		\ifx\FASThesis@type\c@other\relax\else%
-			\def\tempsupervisorlabel{\FASThesis@supervisor@label}%
-			\def\tempsupervisor{\FASThesis@supervisor}%
-		\fi\fi\fi%
+		\FASThesis@auxdim@ly=\dimexpr1.5\FASThesis@titlebox@height\relax%
 		
 		\begin{tikzpicture}[remember picture, overlay]
-			\node[yshift=-\dimexpr0.666\paperheight\relax] at (current page.north west) {%
+			\node[yshift=-\dimexpr0.631\paperheight\relax] at (current page.north west) {%
 				\begin{tikzpicture}[remember picture, overlay]
-					\draw (\FASThesis@auxdim@lx, \dimexpr2.6\FASThesis@titlebox@height+1.8\baselineskip\relax)%
+					\draw (\FASThesis@auxdim@lx, \dimexpr3.0\FASThesis@titlebox@height+2.0\baselineskip\relax)% +1.5
 						node{\hbox to \textwidth{%
 							\GTAmerica@Type\FASThesis@type@text\hfil}};
+					%\fill[FASThesis@FASColor] (0, 0) rectangle (\paperwidth, \dimexpr3.0\FASThesis@titlebox@height\relax);
 					\draw (\FASThesis@auxdim@lx, \FASThesis@auxdim@ly)%
 						node{\usebox{\FASThesis@titlebox@bw}};
 					\draw (\FASThesis@auxdim@lx, -33mm)%
 						node{\parbox{\textwidth}{%
-							\raggedright\GTAmerica@FPAuxBf\tempsupervisorlabel\\[.14\baselineskip]
-							\GTAmerica@FPAux\tempsupervisor}};
+							\raggedright\GTAmerica@FPAuxBf\FASThesis@supervisor@label\\[.14\baselineskip]
+							\GTAmerica@FPAux\FASThesis@supervisor}};
 					\draw (\FASThesis@auxdim@lx, -77mm)%
 						node{\hbox to \textwidth{%
 							\GTAmerica@Place%
@@ -1022,7 +913,7 @@
 		% copyright on the verso of the bastard title page (?)
 		% and citation record
 		\newpage
-		\vspace*{0.5\textheight}\noindent% .631
+		\vspace*{0.631\textheight}\noindent%
 		\ifx\FASThesis@lang\c@czech%
 			\copyright{} \@author, \FASThesis@year{}.\\[\baselineskip]
 		\fi
@@ -1034,14 +925,9 @@
 		\textbf{\FASThesis@citation@record@title}\\
 		\MakeUppercase{\FASThesis@auth@surname}, \FASThesis@auth@firstname. \textsl{\@title}.
 		\FASThesis@place, \FASThesis@year. \FASThesis@type@text. \FASThesis@university, \FASThesis@faculty,
-		\FASThesis@department. %
-		\ifx\FASThesis@type\c@semestral\relax\else%
-		\ifx\FASThesis@type\c@habilitation\relax\else%
-		\ifx\FASThesis@type\c@other\relax\else%
-			\FASThesis@supervisor@label{} \FASThesis@supervisor%
-			\edef\temp{\trim{\FASThesis@supervisor}}%
-			\IfEndWith{\temp}{.}{}{.}%
-		\fi\fi\fi%
+		\FASThesis@department. \FASThesis@supervisor@label{} \FASThesis@supervisor%
+		\edef\temp{\trim{\FASThesis@supervisor}}%
+		\IfEndWith{\temp}{.}{}{.}
 	\end{titlingpage}
 	}
 }
@@ -1088,9 +974,9 @@
 		\FASThesis@signature@place{}, on
 		\FASThesis@day~\FASThesis@typeset@month{\FASThesis@month}~\FASThesis@year\\[5\baselineskip]%
 	\fi
-	\hbox to \textwidth{\hfil\hbox to 75mm{\dotfill}}\\% <== signature line
+	\hbox to \textwidth{\hfil\hbox to 75mm{\dotfill}}\\% << signature line
 	\hbox to \textwidth{\hfil\hbox to 75mm{%
-		\hfil\FASThesis@auth@firstname{} \FASThesis@auth@surname\hfil}}% <== signee's name
+		\hfil\FASThesis@auth@firstname{} \FASThesis@auth@surname\hfil}}% << signee's name
 	%
 	% trademark statement:
 	% if [tm], typeset the trademark statement,
@@ -1140,44 +1026,22 @@
 	\frontmatter%
 	\maketitle%
 	\pagestyle{fasthesisfrontmatter}
-	\ifx\FASThesis@type\c@semestral\relax\else%
-	\ifx\FASThesis@type\c@other\relax\else%
-		\ifx\FASThesis@type\c@rigorous\relax\else%
-		\ifx\FASThesis@type\c@doctoral\relax\else%
-		\ifx\FASThesis@type\c@habilitation\relax\else%
-			\FASThesis@typeset@assignments%
-		\fi\fi\fi%
+	\ifx\FASThesis@type\c@semestral\relax%
+	\else%
+		\FASThesis@typeset@assignments%
 		\FASThesis@typeset@declarations{#1}%
 		\FASThesis@typeset@abstracts%
 		\FASThesis@typeset@acknowledgement%
-	\fi\fi%
-	\ifx\FASThesis@frontmatter@aux@content\empty\relax\else%
-		\FASThesis@frontmatter@aux@content%
 	\fi%
 	\mainmatter%
 	\pagestyle{fasthesisheadings}%
 	\global\let\frontpages\relax% << the \frontpages command can only be used once per document
 }
 
-\newcommand{\setbackpagepic}[1]{%
-	\savebox{\FASThesis@backpage@sign}{%
+\newcommand{\setbackpagesign}[1]{%
+	\savebox{\FASThesis@backpage@img}{%
 		\includegraphics[width=.2\textwidth]{#1}	
 	}
-}
-
-\newcommand{\setbackpageqrcode}{%
-	\@ifnextchar\bgroup\@lpar@setbackpageqrcode\@lnopar@setbackpageqrcode%
-}
-\def\@lpar@setbackpageqrcode#1{%
-	\savebox{\FASThesis@backpage@sign}{%
-		\colorbox{white}{\qrcode[height=.2\textwidth]{#1}}%
-	}%
-}
-\def\@lnopar@setbackpageqrcode{%
-	\def\tempcontent{\FASThesis@qrcode@baseurl\FASThesis@qrcode@workid}%
-	\savebox{\FASThesis@backpage@sign}{%
-		\colorbox{white}{\qrcode[height=.2\textwidth]{\tempcontent}}%
-	}%
 }
 
 \newcommand{\backpage}{%
@@ -1194,28 +1058,26 @@
 		\fi%
 		
 		\begin{tikzpicture}[remember picture, overlay]
-			\node[yshift=-\dimexpr.666\paperheight\relax] at (current page.north west) {%
+			\node[yshift=-\dimexpr.631\paperheight\relax] at (current page.north west) {%
 				\begin{tikzpicture}[remember picture, overlay]
-					\fill[FASThesis@FASColor] (0, 0) rectangle (\paperwidth, \dimexpr2.6\FASThesis@titlebox@height\relax);
+					\fill[FASThesis@FASColor] (0, 0) rectangle (\paperwidth, \dimexpr3.0\FASThesis@titlebox@height\relax);
 				\end{tikzpicture}%
 			};%
-			\ifx\FASThesis@backpage@sign\empty%
-				\relax%
-			\else%
+			\ifx\FASThesis@backpage@img\empty\relax\else%
 				%\newlength{\FASThesis@backpage@img@width}
 				%\settowidth{\FASThesis@backpage@img@width}{\usebox{\FASThesis@backpage@img}}%
-				\node[inner sep=0pt, yshift=-\dimexpr.666\paperheight\relax,
+				\node[inner sep=0pt, yshift=-\dimexpr.631\paperheight\relax,
 				      xshift=\dimexpr.5\paperwidth\relax] at (current page.north west)%
-					{\usebox{\FASThesis@backpage@sign}};%
+					{\usebox{\FASThesis@backpage@img}};%
 			\fi%
 		\end{tikzpicture}%	
 	\else\relax\fi%
-	\global\let\backpage\relax% <== the \backpage command can only be used once per document
+	\global\let\backpage\relax%  << the \backpage command can only be used once per document
 }
 
 % _____________________________________________________________________________
 %
-%        DOCUMENT STYLING COMMANDS
+%	     DOCUMENT STYLING COMMANDS
 % _____________________________________________________________________________
 %
 
@@ -1244,7 +1106,6 @@
 
 \titleformat{\chapter}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@chapter\c@yes%
 		\savebox{\FASThesis@chapter@num@box}{%
 			\ifx\FASThesis@style\c@fullcolor\def\ch@hd@color{FASThesis@FASColorDarker}\else\def\ch@hd@color{black}\fi%
 			\fboxsep=4mm\fboxrule=0mm%
@@ -1278,17 +1139,15 @@
 		\hbox to \FASThesis@chapter@num@width{%
 			\raisebox{-15pt}{\usebox{\FASThesis@chapter@num@box}}
 		}%
-	}{\let\FASThesis@flag@in@chapter\c@no}
+	}{}
 
 \titleformat{name=\chapter, numberless}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@chapter\c@yes%
 		\FASThesis@chapter@title{#1}%
-	}{\let\FASThesis@flag@in@chapter\c@no}
+	}{}
 
 \titleformat{\section}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@section\c@yes%
 		\savebox{\FASThesis@section@num@box}{%
 			\FASThesis@section@num{\thesection%
 				%\ifx\FASThesis@lang\c@czech.\else\relax\fi%
@@ -1304,17 +1163,15 @@
 		\parbox[t]{\FASThesis@section@title@maxspace}{%
 			\raggedright\FASThesis@section@title{#1}%
 		}%
-	}{\let\FASThesis@flag@in@section\c@no}
+	}{}
 
 \titleformat{name=\section, numberless}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@section\c@yes%
 		\FASThesis@section@title{#1}%
-	}{\let\FASThesis@flag@in@section\c@no}
+	}{}
 
 \titleformat{\subsection}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@subsection\c@yes%
 		\savebox{\FASThesis@subsection@num@box}{%
 			\FASThesis@subsection@num{\thesubsection%
 				%\ifx\FASThesis@lang\c@czech.\else\relax\fi%
@@ -1337,17 +1194,15 @@
 		\parbox[t]{\FASThesis@subsection@title@maxspace}{%
 			\raggedright\FASThesis@subsection@title{#1}%
 		}%
-	}{\let\FASThesis@flag@in@subsection\c@no}
+	}{}
 
 \titleformat{name=\subsection, numberless}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@subsection\c@yes%
 		\FASThesis@subsection@title{#1}%
-	}{\let\FASThesis@flag@in@subsection\c@no}
+	}{}
 
 \titleformat{\subsubsection}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@subsubsection\c@yes%
 		\savebox{\FASThesis@subsubsection@num@box}{%
 			\FASThesis@subsubsection@num{\thesubsubsection%
 				%\ifx\FASThesis@lang\c@czech.\else\relax\fi%
@@ -1369,24 +1224,21 @@
 		\parbox[t]{\FASThesis@subsubsection@title@maxspace}{%
 			\raggedright\FASThesis@subsubsection@title{#1}%
 		}%
-	}{\let\FASThesis@flag@in@subsubsection\c@no}
+	}{}
 	
 \titleformat{name=\subsubsection, numberless}[block]
 	{}{}{0pt}{%
-		\let\FASThesis@flag@in@subsubsection\c@yes%
 		\FASThesis@subsubsection@title{#1}%
-	}{\let\FASThesis@flag@in@subsubsection\c@no}
+	}{}
 
 \def\paragraph#1{%
-	\let\FASThesis@flag@in@paragraph\c@yes%
-	\hspace{\baselineskip}%
-	\par\noindent{\FASThesis@paragraph@title{#1}\FASThesis@paragraph@num{.~}}%
-	\let\FASThesis@flag@in@paragraph\c@no%
+\hspace{\baselineskip}%
+\par\noindent{\FASThesis@paragraph@title{#1}\FASThesis@paragraph@num{.~}}%
 }
 
 % _____________________________________________________________________________
 %
-%        BIBLIOGRAPHY STYLING COMMANDS
+%	     BIBLIOGRAPHY STYLING COMMANDS
 % _____________________________________________________________________________
 %
 
@@ -1417,120 +1269,39 @@
 
 % _____________________________________________________________________________
 %
-%        CLASS-SPECIFIC NEW COMMANDS/ENVIRONMENTS
+%	     CLASS-SPECIFIC NEW COMMANDS/ENVIRONMENTS
 % _____________________________________________________________________________
 %
 
-\newlength{\FASThesis@button@font@size}%
-\newlength{\FASThesis@sans@font@size}%
-\newlength{\FASThesis@typewriter@font@size}%
+\NewDocumentCommand{\filename}{v}{{\ttzfamily\small #1}}
+\NewDocumentCommand{\command}{v}{{\ttzfamily\small #1}}
 
-\def\auxfrontmattercontent#1{%
-	\def\FASThesis@frontmatter@aux@content{#1}%
-}
-
-\def\ttfamily{%
-	\fontencoding{T1}\fontfamily{newtxtt}%
-	\fontseries{m}\fontshape{n}%
-	\fontsize{0.92\dimexpr\f@size pt\relax}{\baselineskip}%
-	\selectfont%
-}
-
-\def\ttbfamily{%
-	\fontencoding{T1}\fontfamily{newtxtt}%
-	\fontseries{b}\fontshape{n}%
-	\fontsize{0.92\dimexpr\f@size pt\relax}{\baselineskip}%
-	\selectfont%
-}
-
-\NewDocumentCommand{\filename}{v}{{\ttfamily#1}}%
-\NewDocumentCommand{\command}{v}{{\ttfamily#1}}%
-
-\def\FASThesis@typeset@win@path#1{%
+\def\typesetpath#1{%
 	\edef\FASThesis@temp@fna{\detokenize{#1}}%
-	\StrSubstitute{\FASThesis@temp@fna}{/}{\textbackslash}%
-}
-
-\def\textbsf#1{%
-	\setlength{\FASThesis@sans@font@size}{1.0\dimexpr\f@size pt\relax}%
-	\ifx\FASThesis@flag@in@maintitle\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@chapter\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@section\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@subsection\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@subsubsection\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@paragraph\c@yes\relax\else%
-	\setlength{\FASThesis@sans@font@size}{.87\dimexpr\f@size pt\relax}\fi\fi\fi\fi\fi\fi%
-	{\fontsize{\FASThesis@sans@font@size}{\baselineskip}%
-	\usefont{T1}{GTAmerica-LF}{sbc}{n}#1}%
-}
-
-\def\textsf#1{%
-	\setlength{\FASThesis@sans@font@size}{1.0\dimexpr\f@size pt\relax}%
-	\ifx\FASThesis@flag@in@maintitle\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@chapter\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@section\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@subsection\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@subsubsection\c@yes\relax\else%
-	\ifx\FASThesis@flag@in@paragraph\c@yes\relax\else%
-	\setlength{\FASThesis@sans@font@size}{.87\dimexpr\f@size pt\relax}\fi\fi\fi\fi\fi\fi%
-	{\fontsize{\FASThesis@sans@font@size}{\baselineskip}%
-	\usefont{T1}{GTAmerica-LF}{mc}{n}#1}%
-}
-
-\def\texttt#1{%
-	{\fontencoding{T1}\fontfamily{newtxtt}%
-	\fontseries{m}\fontshape{n}%
-	\ifx\FASThesis@flag@in@maintitle\c@yes\fontsize{1.1\dimexpr\f@size pt\relax}{\baselineskip}\else%
-	\ifx\FASThesis@flag@in@chapter\c@yes\fontsize{1.1\dimexpr\f@size pt\relax}{\baselineskip}\else%
-	\ifx\FASThesis@flag@in@section\c@yes\fontsize{1.1\dimexpr\f@size pt\relax}{\baselineskip}\else%
-	\ifx\FASThesis@flag@in@subsection\c@yes\fontsize{1.1\dimexpr\f@size pt\relax}{\baselineskip}\else%
-	\ifx\FASThesis@flag@in@subsubsection\c@yes\fontsize{1.1\dimexpr\f@size pt\relax}{\baselineskip}\else%
-	\ifx\FASThesis@flag@in@paragraph\c@yes\fontsize{1.1\dimexpr\f@size pt\relax}{\baselineskip}\else%
-	\fontsize{0.92\dimexpr\f@size pt\relax}{\baselineskip}\fi\fi\fi\fi\fi\fi%
-	\selectfont#1}%
-}
-
-\def\term#1{{\bfseries\itshape #1}}
-\def\product#1{\textbsf{#1}}
-
-\def\button#1{%
-	\setlength{\FASThesis@button@font@size}{.9\dimexpr\f@size pt\relax}%
-	{%
-	\setlength{\fboxsep}{.15\dimexpr\f@size pt\relax}%
-	\framebox{%
-		\fontsize{\FASThesis@button@font@size}{\baselineskip}%
-		\usefont{T1}{GTAmerica-LF}{bc}{n}#1%
-	}}%
-}
-
-\newtcbox{\hotkey}{%
-	on line, colback=white, colframe=black, boxsep=0pt, boxrule=0pt, size=small, arc=2pt,%
-	toprule=.5pt, bottomrule=.5pt, leftrule=1pt, rightrule=1pt,%
-	top=0pt, bottom=0pt, left=0pt, right=0pt,%
-	fontupper=\fontsize{.87\dimexpr\f@size pt\relax}{\baselineskip}\usefont{T1}{GTAmerica-LF}{mc}{n}%
+	\StrSubstitute{\FASThesis@temp@fna}{/}{\textbackslash}%[\FASThesis@temp@fnb]%
 }
 
 \newcommand{\winprompt}{}
 \newcommand{\uxprompt}{}
 \newcommand{\setwinprompt}[1]{%
 	\renewcommand{\winprompt}{%
-		{\bfseries\FASThesis@typeset@win@path{#1}>}%
+		{\bfseries\typesetpath{#1}>}%
 	}%
 }
 \newcommand{\setuxprompt}[2]{%
 	\renewcommand{\uxprompt}{%
 		{\ifx\FASThesis@style\c@fullcolor\color{FASThesis@UXConGreen}\else\color{black}\fi%
-			\bfseries#1}{\bfseries:}%
+			\bfseries\typesetpath{#1}}{\bfseries:}%
 		{\ifx\FASThesis@style\c@fullcolor\color{FASThesis@UXConBlue}\else\color{black}\fi%
-			\bfseries#2}{\bfseries\$~}%
+			\bfseries\typesetpath{#2}}{\bfseries\$~}%
 	}%
 }
 
-\ifx\FASThesis@type\c@other%
-	\newcommand{\worktypespec}[1]{%
-		\def\FASThesis@type@text{#1}%
-	}%
-\fi%
+\def\term#1{{\bfseries\itshape #1}}
+
+% \renewcommand{\lstlistingnamestyle}{%
+	% \small\bfseries%
+% }
 
 \lstdefinestyle{FASThesisLstStyle}{
 	backgroundcolor=\color{white},
@@ -1538,7 +1309,7 @@
 	keywordstyle=\bfseries,
 	numberstyle=\tiny\color{gray},
 	stringstyle=\color{black},
-	basicstyle=\ttfamily\footnotesize,
+	basicstyle=\ttzfamily\footnotesize,
 	breakatwhitespace=false,
 	breaklines=true,
 	captionpos=t,
@@ -1553,13 +1324,13 @@
 	tabsize=2,
 	extendedchars=true,
 	literate={á}{{\'a}}1 {č}{{\v{c}}}1 {ď}{{\v{d}}}1 {é}{{\'e}}1 {ě}{{\v{e}}}1 {è}{{\`{e}}}1 {í}{{\'{\i}}}1 {ľ}{{\v{l}}}1 {ň}{{\v{n}}}1 {ó}{{\'o}}1 {ŕ}{{\'r}}1 {ř}{{\v{r}}}1 {š}{{\v{s}}}1 {ť}{{\v{t}}}1 {ú}{{\'u}}1 {ů}{{\r{u}}}1 {ý}{{\'y}}1 {ž}{{\v{z}}}1
-	{Á}{{\'A}}1 {Č}{{\v{C}}}1 {Ď}{{\v{D}}}1 {É}{{\'E}}1 {Ě}{{\v{E}}}1 {È}{{\`{E}}}1 {Í}{{\'I}}1 {Ľ}{{\v{L}}}1 {Ň}{{\v{N}}}1 {Ó}{{\'O}}1 {Ŕ}{{\'R}}1 {Ř}{{\v{R}}}1 {Š}{{\v{S}}}1 {Ť}{{\v{T}}}1 {Ú}{{\'U}}1 {Ů}{{\r{U}}}1 {Ý}{{\'Y}}1 {Ž}{{\v{Z}}}1
+	{Á}{{\'A}}1 {Č}{{\v{C}}}1 {Ď}{{\v{D}}}1 {É}{{\'E}}1 {Ě}{{\v{E}}}1 {È}{{\`{E}}}1 {Í}{{\'I}}1 {Ľ}{{\v{L}}}1 {Ň}{{\v{N}}}1 {Ó}{{\'O}}1 {Ŕ}{{\'R}}1 {Ř}{{\v{R}}}1 {Š}{{\v{Š}}}1 {Ť}{{\v{T}}}1 {Ú}{{\'U}}1 {Ů}{{\r{U}}}1 {Ý}{{\'Y}}1 {Ž}{{\v{Z}}}1
 }
 
 \lstdefinestyle{FASThesisConStyle}{
 	backgroundcolor=\color{FASThesis@UWBGray!25},
 	numberstyle=\tiny\color{gray},
-	basicstyle=\ttfamily\footnotesize,
+	basicstyle=\ttzfamily\footnotesize,
 	breakatwhitespace=true,
 	breaklines=true,
 	captionpos=t,
@@ -1575,45 +1346,48 @@
 	escapechar=`,
 	extendedchars=true,
 	literate={á}{{\'a}}1 {č}{{\v{c}}}1 {ď}{{\v{d}}}1 {é}{{\'e}}1 {ě}{{\v{e}}}1 {è}{{\`{e}}}1 {í}{{\'{\i}}}1 {ľ}{{\v{l}}}1 {ň}{{\v{n}}}1 {ó}{{\'o}}1 {ŕ}{{\'r}}1 {ř}{{\v{r}}}1 {š}{{\v{s}}}1 {ť}{{\v{t}}}1 {ú}{{\'u}}1 {ů}{{\r{u}}}1 {ý}{{\'y}}1 {ž}{{\v{z}}}1
-	{Á}{{\'A}}1 {Č}{{\v{C}}}1 {Ď}{{\v{D}}}1 {É}{{\'E}}1 {Ě}{{\v{E}}}1 {È}{{\`{E}}}1 {Í}{{\'I}}1 {Ľ}{{\v{L}}}1 {Ň}{{\v{N}}}1 {Ó}{{\'O}}1 {Ŕ}{{\'R}}1 {Ř}{{\v{R}}}1 {Š}{{\v{S}}}1 {Ť}{{\v{T}}}1 {Ú}{{\'U}}1 {Ů}{{\r{U}}}1 {Ý}{{\'Y}}1 {Ž}{{\v{Z}}}1
+	{Á}{{\'A}}1 {Č}{{\v{C}}}1 {Ď}{{\v{D}}}1 {É}{{\'E}}1 {Ě}{{\v{E}}}1 {È}{{\`{E}}}1 {Í}{{\'I}}1 {Ľ}{{\v{L}}}1 {Ň}{{\v{N}}}1 {Ó}{{\'O}}1 {Ŕ}{{\'R}}1 {Ř}{{\v{R}}}1 {Š}{{\v{Š}}}1 {Ť}{{\v{T}}}1 {Ú}{{\'U}}1 {Ů}{{\r{U}}}1 {Ý}{{\'Y}}1 {Ž}{{\v{Z}}}1
 }
 
-\lstnewenvironment{code}[2]{%
-	\lstset{style=FASThesisLstStyle}%
-	\lstset{language=#1}%
-	\lstset{caption={#2}}%
-}{}
+\lstnewenvironment{code}[2]{
+	\lstset{style=FASThesisLstStyle}
+	\lstset{language=#1}
+	\lstset{caption={#2}}
+}
+{}
 
 \lstnewenvironment{console}[1]{%
-	\lstset{style=FASThesisConStyle}%
-	\lstset{caption={#1}}%
+	\lstset{style=FASThesisConStyle}
+	\lstset{caption={#1}}
 	\global\let\FASThesis@lstlistingname\lstlistingname%
 	\renewcommand{\lstlistingname}{\FASThesis@listing@label}%
-}{%
-	\renewcommand{\lstlistingname}{\FASThesis@lstlistingname}%
+}
+{%
+	\renewcommand{\lstlistingname}{\FASThesis@lstlistingname}
 }
 
-\newenvironment{important}{}{}
+\newenvironment{important}{\par\noindent}{\par\noindent}
+
 \ifx\FASThesis@style\c@fullcolor%
 	\tcolorboxenvironment{important}{breakable, blanker,%
-	text width=\textwidth - 8mm, left=4mm, before skip=.5\baselineskip, after skip=.75\baselineskip,%
-	borderline west={1.5mm}{0pt}{FASThesis@ImportantColor}, borderline east={1.5mm}{-4mm}{FASThesis@ImportantColor}}%
+	text width=\textwidth - 8mm, left=4mm, before skip=\baselineskip, after skip=\baselineskip,%
+	borderline west={1.5mm}{0pt}{FASThesis@ImportantColor}, borderline east={1.5mm}{-4mm}{FASThesis@ImportantColor}}
 \else%
 	\tcolorboxenvironment{important}{breakable, blanker,%
-	text width=\textwidth - 8mm, left=4mm, before skip=\baselineskip, after skip=.75\baselineskip,%
-	borderline west={1.0mm}{0pt}{black}, borderline east={1.0mm}{-4mm}{black}}%
+	text width=\textwidth - 8mm, left=4mm, before skip=\baselineskip, after skip=\baselineskip,%
+	borderline west={1.0mm}{0pt}{black}, borderline east={1.0mm}{-4mm}{black}}
 \fi%
 
 % _____________________________________________________________________________
 %
-%        TESTING
+%	     TESTING
 %        *** This part should be removed in the release version ***
 % _____________________________________________________________________________
 %
 
 % _____________________________________________________________________________
 %
-%        CLASS FILE EPILOGUE
+%	     CLASS FILE EPILOGUE
 % _____________________________________________________________________________
 %
 

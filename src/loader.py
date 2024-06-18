@@ -370,7 +370,7 @@ class Loader:
                 self.out_labels.append(label)
 
 if __name__ == "__main__":
-    loader = Loader(subject_nums=[1])
+    loader = Loader(subject_nums=[1], verbose=True)
     ds, stats = loader.load_dir(Path(argv[1]))
     print(stats)
     torch.save(ds, argv[2])
