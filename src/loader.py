@@ -223,7 +223,7 @@ class DataSetStats:
         output += "\n"
 
         output += "---------------  ARTIFACT REMOVAL EFFECTS  ---------------\n"
-        output += f"Point to point threshold:\t{self.ptp_thresh}\n"
+        output += f"Peak to peak threshold:\t{self.ptp_thresh}\n"
         output += f"Refused by ptp threshold:\t{self.ptp_refused * 100:.2f}%\n"
         output += f"Class balance:\t{self.class_balance}\n"
         output += "\n"

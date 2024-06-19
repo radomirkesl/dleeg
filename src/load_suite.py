@@ -3,6 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 from sys import argv
 from time import time
+from typing import Optional
 
 import torch
 
@@ -15,8 +16,19 @@ class LoadSuite:
         self.outputs_dir = outputs_dir
         self.overwrite = overwrite
 
-    def load_and_process(self, experiment_name: str, subject_spec: SubjectSpec):
-        loader = Loader(subject_spec=subject_spec)
+    def load_and_process(
+        self,
+        experiment_name: str,
+        subject_spec: Optional[SubjectSpec] = None,
+        loader: Optional[Loader] = None,
+    ):
+        if not loader:
+            if not subject_spec:
+                print(
+                    f"No subject specification nor loader provided for {experiment_name}, no action taken."
+                )
+                return
+            loader = Loader(subject_spec=subject_spec)
         experiment_output = self.outputs_dir / experiment_name
         experiment_output.mkdir(exist_ok=True)
         data_path = experiment_output / "data.ds"
@@ -45,7 +57,7 @@ class LoadSuite:
 
 if __name__ == "__main__":
     if len(argv) != 3:
-        print("Usage: python load_suit.py <inputs_dir> <outputs_dir>")
+        print("Usage: python load_suite.py <inputs_dir> <outputs_dir>")
         exit(1)
     inputs_dir = Path(argv[1])
     if not inputs_dir.exists():

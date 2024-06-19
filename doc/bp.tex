@@ -5,6 +5,7 @@
 \supervisor{Doc. Ing. Roman Mouček, Ph.D.}
 \title{Neural networks for processing recordings of brain electrical activity}
 % TODO:
+\stagworkid{96954}
 \assignment{zadani.pdf}
 \signdate{31}{12}{2022}{V Nové Vsi u Nového Města na Moravě}
 \addbibresource{references.bib}
@@ -44,7 +45,7 @@ The electrodes are usually placed according to the international 10-20 system, o
 \begin{figure}[h]
 	\label{fig:channels}
 	\includegraphics[width=\textwidth]{fig/channels.png}
-	\caption{The 10-10 system of electrode placement. Source: \href{https://commons.wikimedia.org/wiki/File:EEG_10-10_system_with_additional_information.svg}{\textit{Wikimedia Commons}}.}
+	\caption[The 10-10 system of electrode placement]{The 10-10 system of electrode placement. Source: \href{https://commons.wikimedia.org/wiki/File:EEG_10-10_system_with_additional_information.svg}{\textit{Wikimedia Commons}}}
 \end{figure}
 
 One of the main advantages (along with the cost and convenience) of EEG is its great temporal resolution granted by the high speed of electric field propagation~\cite{roy:eeg:review:19}. On the other hand, the spatial resolution is often not great, which is caused by the tissues between the brain and the electrodes~\cite{roy:eeg:review:19, berezutskaya:ieeg:22}. A single electrode also obtains signals from several overlapping neural sources, leading to spatial correlation between the channels, making it difficult to isolate the desired information~\cite{roy:eeg:review:19, luck:erp:book}. In addition to that EEG also suffers noise from unrelated physiological signals, such as electromyogram from eye blinks~\cite{craik:dl:eeg:rev:19}.
@@ -79,7 +80,7 @@ An interesting property of motor imagery is that it tends to have a similar effe
 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{fig/erders.png}
-	\caption{Ongoing EEG with right finger movement, $t=0s$ marks the start of movement. Note ERD prior to movement onset and ERS during movement \textcopyright 2001 IEEE,~\cite{pfurtscheller:mi:01}.}
+	\caption[EEG signal with visible ERD and ERS]{Ongoing EEG with right finger movement, $t=0s$ marks the start of movement. Note ERD prior to movement onset and ERS during movement \textcopyright 2001 IEEE,~\cite{pfurtscheller:mi:01}}
 \end{figure}
 
 % 2) In the case of illustrations or tabular material, we require that the copyright line © [Year of original publication] IEEE appear prominently with each reprinted figure and/or table.
@@ -115,7 +116,7 @@ The convolutional layer is the core of CNNs. It applies small-sized filters, als
 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{fig/conv.png}
-	\caption{Convolution operation with a kernel of size 3x3 and step of 1. Step denotes by how many spaces the filter is moved every iteration. Source: \href{https://commons.wikimedia.org/wiki/File:CNN-filter-animation-1.gif}{\textit{Wikimedia Commons}}.}
+	\caption[Convolution operation]{Convolution operation with a kernel of size 3x3 and step of 1. Step denotes by how many spaces the filter is moved every iteration. Source: \href{https://commons.wikimedia.org/wiki/File:CNN-filter-animation-1.gif}{\textit{Wikimedia Commons}}}
 \end{figure}
 
 Pooling layers aim to further reduce the dimensionality by applying a function over a kernel-sized window of the input. The most common pooling function is max pooling, which outputs the maximum value in the window, but average pooling is common as well. While this operation generally preserves the most important information, it is still destructive in nature. For this reason, a kernel of size 2x2 is usually used. With a step of 2 (moving the kernel two spaces at a time) this results in a 75\% reduction of the input~\cite{oshea:cnn:15}.
@@ -123,7 +124,7 @@ Pooling layers aim to further reduce the dimensionality by applying a function o
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.75\textwidth]{fig/maxpool.png}
-	\caption{Max pooling operation with a kernel of size 2x2 and step of 2. Source: \href{https://commons.wikimedia.org/wiki/File:Max_pooling.png}{\textit{Wikimedia Commons}}.}
+	\caption[Max pooling operation]{Max pooling operation with a kernel of size 2x2 and step of 2. Source: \href{https://commons.wikimedia.org/wiki/File:Max_pooling.png}{\textit{Wikimedia Commons}}}
 \end{figure}
 
 Overall CNNs' ability to extract patterns and reduce the complexity of models proves to be very useful in a variety of tasks, including EEG classification, where it can even overcome the noisiness~\cite{zhang:similar:20}.
@@ -137,7 +138,7 @@ Long Short-Term Memory network is a type of RNN, designed to overcome this issue
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{fig/lstm.png}
-	\caption{LSTM unit. $F_t$ marks the forget gate, $I_t$ is the input gate and $O_t$ the output gate. $C$ symbolizes the cell state, $h$ the hidden state, $X$ marks the input, which gets concatenated with $h$ and $O$ marks the output, which is actually just a copy of $h$. Source: \href{https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg}{\textit{Wikimedia Commons}}.}
+	\caption[LSTM unit]{LSTM unit. $F_t$ marks the forget gate, $I_t$ is the input gate and $O_t$ the output gate. $C$ symbolizes the cell state, $h$ the hidden state, $X$ marks the input, which gets concatenated with $h$ and $O$ marks the output, which is actually just a copy of $h$. Source: \href{https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg}{\textit{Wikimedia Commons}}}
 \end{figure}
 
 \chapter{State-of-the-art}
@@ -152,7 +153,9 @@ The most of the comparison can be seen in table \ref{tab:datasets}. Note that tr
 Based on our findings, the Stieger-62 dataset was chosen for further experimentation. The main reason is its size, which beats all the listed competition (and likely most of the unlisted as well) and while the Dreyer-87 dataset has a greater number of participants, the amount of trials and recording time in Stieger-62 is far superior, and we consider that more important. This dataset also fulfils all other requirements (validation, accessibility, \dots) and has a reasonable amount of citations. For those reasons it will be examined more closely and likely chosen for our experiments. If new issues appear about it, the Dreyer-87 dataset will be considered.
 
 \begin{table}
+	\label{tab:aliases}
 	\centering
+	\caption{Aliases of compared datasets}
 	\begin{tabular}{@{}p{0.15\textwidth}p{0.6\textwidth}p{0.15\textwidth}@{}}
 		\toprule
 		\textbf{Alias}        & \textbf{Article name}                                                                                    & \textbf{Citation}       \\
@@ -164,12 +167,12 @@ Based on our findings, the Stieger-62 dataset was chosen for further experimenta
 		in a large population & \cite{data:stieger:21}                                                                                                             \\
 		\bottomrule
 	\end{tabular}
-	\caption{Aliases of compared datasets.}
-	\label{tab:aliases}
 \end{table}
 
 \begin{table}
+	\label{tab:datasets}
 	\centering
+	\caption{Comparison of recent datasets}
 	\resizebox{\textwidth}{!}{
 		\begin{tabular}{@{}*{9}{l}@{}}
 			\toprule
@@ -182,8 +185,6 @@ Based on our findings, the Stieger-62 dataset was chosen for further experimenta
 			\bottomrule
 		\end{tabular}
 	}
-	\caption{Comparison of recent datasets.}
-	\label{tab:datasets}
 \end{table}
 
 % TODO: Review and edit
@@ -244,13 +245,13 @@ A system like this could for example simplify the experiment procedure and incre
 
 In this chapter, the specifics of the experiment, that was conducted in this work are explained. Most of these came about from an agreement with the thesis advisor or were the result of "metaexperimentation" during the development. By metaexperimentation, manual testing of models with different architectures and hyperparameters built upon a small subset of the dataset, as well as with different preprocessing approaches, is meant. Note that all the parameters and hyperparameters that were chosen in this way and used in the experiments are set as defaults in the associated code.
 
-The Stieger-62 dataset was eventually selected for the experiments and the general decided direction was to focus on models for a specific group of subjects, based on shared metadata.
+The Stieger-62 dataset was eventually selected for the experiments and the general decided direction was to focus on models for a specific group of subjects, based on shared metadata, as discussed in section \ref{sec:metadata:specific}.
 
-The resulting application has been split into two independently working parts. The first part is a data processing tool, the purpose of which is to load the data, as provided by the dataset authors, process it and save it in a format, which is then directly digestible by the models. This includes filtering the data, based on subject metadata, artefact removal and more. The second part is capable of training and testing the models themselves. Its output is a trained model for potential future use and a report on the model's performance.
+The resulting application has been split into two independently working parts. The first part is a data processing tool, the purpose of which is to load the data, as provided by the dataset authors, process it and save it in a format, which is then directly digestible by the models. This includes filtering the data, based on subject metadata, artifact removal and more. The second part is capable of training and testing the models themselves. Its output is a trained model for potential future use and a report on the model's performance.
 
 Both parts were built in the Python programming language, using the following libraries:
 
-\paragraph{NumPy:} A library providing high-level mathematical operations, mostly for working with n-dimensional arrays. In this work it is used during the loading process, for reducing the data in the desired way and artefact removal.
+\paragraph{NumPy:} A library providing high-level mathematical operations, mostly for working with n-dimensional arrays. In this work it is used during the loading process, for reducing the data in the desired way and artifact removal.
 
 \paragraph{SciPy:} A library providing mostly tools for scientific computing. Here it is only used for loading \texttt{MATLAB}-formatted data into Python's structures (dictionaries and \texttt{NumPy} arrays).
 
@@ -283,9 +284,9 @@ As stated previously, the main goal of the experiment would be to train intra-su
 
 The first tool the \texttt{Loader} class provides is the ability to hand-pick specific users or sessions by number. These can be provided to the \texttt{Loader} as constructor arguments in the form of lists. This can be useful for example for creating small datasets for testing purposes, or for selecting only the later sessions, where users are expected to be more proficient. It also speeds up the loading process, because this information is encoded in file names, so the \texttt{Loader} does not need to actually load the \texttt{.mat} files, which were not selected.
 
-The main idea, however, is accepting only trials from subjects who match a specific set of criteria. For this reason, the \texttt{load\_dir} method always first (after loading the file) checks, whether the subject specific metadata matches the criteria and if not, immediately moves on to the next file. The criteria are passed to the \texttt{Loader} as a \texttt{SubjectSpec} object, which is a dataclass, where the required criteria can be specified. The options correspond to subject-specific metadata fields in the dataset and can be seen in code sample \ref{lst:subjectspec}. This class implements a \texttt{passes} method, which checks a dictionary of subject metadata (directly extracted from the loaded file by the \texttt{load\_dir} method) against the criteria it represents.
+The main idea, however, is accepting only trials from subjects who match a specific set of criteria. For this reason, the \texttt{load\_dir} method always first (after loading the file) checks, whether the subject specific metadata matches the criteria and if not, immediately moves on to the next file. The criteria are passed to the \texttt{Loader} as a \texttt{SubjectSpec} object, which is a dataclass, where the required criteria can be specified. The options correspond to subject-specific metadata fields in the dataset and can be seen in code sample \ref{lst:subjectspec}. All of these fields can be set in the constructor. If a field is set to \texttt{None}, this criterion will not be checked. The "\texttt{range}" criteria are inclusive on the lower end and exclusive on the upper end. \texttt{SubjectSpec} implements a \texttt{passes} method, which checks a dictionary of subject metadata (directly extracted from the loaded file by the \texttt{load\_dir} method) against the criteria it represents.
 
-\begin{code}{Python}{Header of the SubjectSpec dataclass. All of these fields can be set in the constructor. If a field is set to \texttt{None}, this criterion will not be checked. The "\texttt{range}" criteria are inclusive on the lower end and exclusive on the upper end.\label{lst:subjectspec}}
+\begin{code}{Python}{Header of the \texttt{SubjectSpec} dataclass\label{lst:subjectspec}}
 	@dataclass
 	class SubjectSpec:
 	gender: Optional[Literal["M", "F"]] = None
@@ -299,7 +300,68 @@ The main idea, however, is accepting only trials from subjects who match a speci
 	hobby: Optional[List[Literal["Y", "U", "N"]]] = None
 \end{code}
 
-\subsection{Preprocessing}
+\subsection{Data Reduction}
+
+The next steps happen in the \texttt{process\_data} method of the \texttt{Loader} class. It accepts a dictionary of the loaded data, reduces it in ways described below and adds the results to internal structures of the \texttt{Loader}. The requirements are passed to the \texttt{Loader} as a \texttt{LoadDomain} object, which is a dataclass, where the requirements can be specified. The first possible reduction is selecting one of the three tasks, which is passed as an \texttt{enum}. In our experiments, the data from all tasks is combined (by passing \texttt{None}, this reduction will not be applied).
+
+\begin{code}{Python}{Header of the \texttt{LoadDomain} dataclass}
+	@dataclass
+	class LoadDomain:
+	task: Optional[Task]
+	time_frame: Optional[Tuple[int, int]]
+	channels: List[str]
+\end{code}
+
+The next applied reduction is selecting the channels, that will be included. These are passed as a list of strings, where each string is an identifier of a channel. The dataset provides the following options:
+
+\texttt{FP1, FPZ, FP2, AF3, AF4, F7, F5, F3, F1, FZ, F2, F4, F6, F8, FT7, FC5, FC3, FC1, FCZ, FC2, FC4, FC6, FT8, T7, C5, C3, C1, CZ, C2, C4, C6, T8, TP7, CP5, CP3, CP1, CPZ, CP2, CP4, CP6, TP8, P7, P5, P3, P1, PZ, P2, P4, P6, P8, PO7, PO5, PO3, POZ, PO4, PO6, PO8, CB1, O1, OZ, O2, CB2}
+
+In the experiments, it was decided to use the following 23 channels, which are placed over the primary sensorimotor cortex and its surroundings:
+
+\texttt{FC5, FC3, FC1, FCZ, FC2, FC4, FC6, C5, C3, C1, CZ, C2, C4, C6, CP5, CP3, CP1, CPZ, CP2, CP4, CP6, CB1, CB2}
+
+The final reduction applied reduction is in the temporal domain. This is similar to epoching, a common practice in EEG processing, where only the relevant information is extracted from longer recordings. However, the Stieger-62 dataset is already divided into trials, so in this case the process is simplified to merely choosing a time frame from each trial. During recording, the subject was presented a target (direction on the screen) two seconds after the start of recording for the given trial, but the cursor movement was still blocked at this point. Two more seconds later the cursor was unblocked and the subject could start moving it, effectively receiving visual feedback on their efforts. The feedback phase would last until a target is hit (including hitting the wrong one) or until the timeout after 6 seconds (10 second after trial start). Since ERD usually occurs during planning a movement, about 2 seconds before actual execution, we decided to use a time frame starting 2 seconds before the feedback phase (2 seconds after the start of the trial) and ending 2 seconds after the start of the feedback phase (6 seconds after the start of the trial). Because of the 1000 Hz sampling rate, the time frame becomes (2000, 6000), resulting in 4000 samples per trial per channel.
+
+% TODO: Could add some source(s) here
+
+Because the feedback phase can have varying lengths, some trials might end up shorter than required. In this case, the trial is padded with a reflection of itself (inserting the same data in reverse order) in an attempt to preserve the nature of the signal.
+
+\subsection{Preprocessing and Feature Extraction}
+
+The final step of the data processing is the preprocessing. The only tool eventually applied was artifact removal, using the peak-to-peak method. This simple method finds the difference between the lowest and highest value in each channel in a trial and if this difference is greater than a chosen threshold for any channel, the trial is not included in the dataset. The threshold is passed to the \texttt{Loader} on construction and can be set to \texttt{None}, in which case the method is not applied. In the experiments, the threshold was set to 130 $\mu$V.
+
+Bandpass filtering was omitted in order to test the models' ability to capture the required information without it. Data augmentation was considered, but eventually deemed unnecessary, as the dataset is already relatively large.
+
+The raw time series has been chosen for data representation. That means that the raw data, reduced in the ways described above, is used as features for classification.
+
+\subsection{A Suite of Loads}
+
+The \texttt{load\_dir} method of the \texttt{Loader} class returns a \texttt{TensorDataset} type object, provided by \texttt{PyTorch}, as well as a \texttt{DataSetStats} object. The \texttt{TensorDataset} can be loaded into a \texttt{DataLoader} (also from \texttt{PyTorch}) for training as a part of the same process, but it might be more practical to save the processed data into a file to be able to reuse it for multiple experiments. The \texttt{DataSetStats} dataclass is defined in \texttt{loader.py} and provides a way to store important information about the data that was actually loaded, including the parameters, such as \texttt{SubjectSpec} and \texttt{LoadDomain} that were used during the loading process. A \texttt{DataSetStats} object can be converted to a string, usable for printing to the console, or to a dictionary that can be than used to save the information as a \texttt{.json} file.
+
+The \texttt{LoadSuite} class, provided in \texttt{load\_suite.py}, is a tool for running multiple loads in succession. On construction, it is passed a path to an input directory and an output directory. The input directory needs to contain the \texttt{.mat} files of the dataset (not necessarily all of them) and the output directory will be used to save the processed data.
+The class implements a \texttt{load\_and\_process} method, which takes an experiment name and a \texttt{Loader} or \texttt{SubjectSpec} as arguments. If a \texttt{Loader} is given, it will be used to load the data, if a \texttt{SubjectSpec} is given, a default \texttt{Loader} will be created using the parameters discussed in previous sections (this option exists to shorten the scripts for load suites).
+The method creates a subdirectory in the output directory, named with the experiment name, runs the \texttt{Loader.load\_dir} method and saves the output to the subdirectory. The \texttt{TensorDataset} is saved using \texttt{torch.save} with the filename \texttt{data.ds} and the \texttt{DataSetStats} are saved using \texttt{json.dump} with the filename \texttt{data\_stats.json}. An example use of the \texttt{LoadSuite} class can be seen in code sample \ref{lst:loadsuite}, where the dataset is loaded as three separate sets, split by the age group of the subjects.
+
+\begin{code}{Python}{An example load suite\label{lst:loadsuite}}
+	suite = LoadSuite(inputs_dir, outputs_dir)
+
+	suite.load_and_process(
+	"all_0-30",
+	SubjectSpec(age_range=(0, 30)),
+	)
+	suite.load_and_process(
+	"all_30-50",
+	SubjectSpec(age_range=(30, 50)),
+	)
+	suite.load_and_process(
+	"all_50-100",
+	SubjectSpec(age_range=(50, 100)),
+	)
+\end{code}
+
+\section{Classification}
+
+
 
 
 % \appendix
@@ -307,6 +369,11 @@ The main idea, however, is accepting only trials from subjects who match a speci
 
 \backmatter
 \printbibliography
+\listoffigures
+\listoftables
+\listoflistings
+
+\setbackpageqrcode
 \backpage
 
 \end{document}
