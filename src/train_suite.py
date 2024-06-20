@@ -44,7 +44,7 @@ class TrainSuite:
                 continue
             if not self.overwrite and results_path.exists():
                 print(
-                    f"Skipping {experiment_name} as {results_path.name} exists, to retrain use TrainSuite(overwrite=True)"
+                    f"Skipping {experiment_name} as {results_path.name} exists, to retrain use CLSuite(overwrite=True)"
                 )
                 continue
             print("----------------------------------------")
@@ -97,6 +97,9 @@ if __name__ == "__main__":
     top_dir = Path(argv[1])
     if not top_dir.exists():
         print(f"{top_dir} does not exist")
+        exit(1)
+    if not top_dir.is_dir():
+        print(f"{top_dir} is not a directory")
         exit(1)
 
     suite = TrainSuite(

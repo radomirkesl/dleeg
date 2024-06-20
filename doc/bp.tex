@@ -251,17 +251,21 @@ The resulting application has been split into two independently working parts. T
 
 Both parts were built in the Python programming language, using the following libraries:
 
-\paragraph{NumPy:} A library providing high-level mathematical operations, mostly for working with n-dimensional arrays. In this work it is used during the loading process, for reducing the data in the desired way and artifact removal.
+\begin{itemize}
 
-\paragraph{SciPy:} A library providing mostly tools for scientific computing. Here it is only used for loading \texttt{MATLAB}-formatted data into Python's structures (dictionaries and \texttt{NumPy} arrays).
+\item\product{NumPy}: A library providing high-level mathematical operations, mostly for working with n-dimensional arrays. In this work it is used during the loading process, for reducing the data in the desired way and artifact removal.
 
-\paragraph{PyTorch:} A mostly deep learning-focused library, providing tools for building and training neural networks. It has a relatively low level of abstraction, allowing for high control over the models. \texttt{PyTorch} mostly works with tensors, which are similar to \texttt{NumPy} arrays, but can for example be moved to an accelerator (such as a GPU) for faster computation. It is mainly used to create the architecture of the models, but the loader also saves the data as \texttt{PyTorch} tensors.
+\item\product{SciPy}: A library providing mostly tools for scientific computing. Here it is only used for loading \texttt{MATLAB}-formatted data into Python's structures (dictionaries and \texttt{NumPy} arrays).
 
-\paragraph{Scikit-learn:} A library providing tools for machine learning. It is only used for creating folds for k-fold cross-validation.
+\item\product{PyTorch}: A mostly deep learning-focused library, providing tools for building and training neural networks. It has a relatively low level of abstraction, allowing for high control over the models. \texttt{PyTorch} mostly works with tensors, which are similar to \texttt{NumPy} arrays, but can for example be moved to an accelerator (such as a GPU) for faster computation. It is mainly used to create the architecture of the models, but the loader also saves the data as \texttt{PyTorch} tensors.
 
-\paragraph{PyTorch Lightning:} A library built on top of \texttt{PyTorch}, providing a higher level of abstraction, sacrificing control in order to reduce boilerplate code and increase readability. It is used for the training and testing processes.
+\item\product{Scikit-learn}: A library providing tools for machine learning. It is only used for creating folds for k-fold cross-validation.
 
-\paragraph{TorchMetrics:} A library providing high-level tools for gathering metrics for \texttt{PyTorch} and \texttt{PyTorch Lightning} models. It is used to gather metrics while testing the models.
+\item\product{PyTorch Lightning}: A library built on top of \texttt{PyTorch}, providing a higher level of abstraction, sacrificing control in order to reduce boilerplate code and increase readability. It is used for the training and testing processes.
+
+\item\product{TorchMetrics}: A library providing high-level tools for gathering metrics for \texttt{PyTorch} and \texttt{PyTorch Lightning} models. It is used to gather metrics while testing the models.
+
+\end{itemize}
 
 \section{Data Loading and Preprocessing}
 
@@ -359,11 +363,14 @@ The method creates a subdirectory in the output directory, named with the experi
 	)
 \end{code}
 
-In the conducted experiment, the following subsets were used: All subjects, younger than 30 years of age, between 30 and 50 years of age, older than 50 years of age and those, who considered themselves athletes. The use of more subsets was planned, but then the experiments were interupted for reasons discussed in chapter \ref{chap:results} (Results).
+% TODO: Did I add sub1? Where is the discussion?
+
+In the conducted experiment, the following subsets were used: All subjects, younger than 30 years of age, between 30 and 50 years of age, older than 50 years of age and those, who considered themselves athletes. The use of more subsets was planned, but then the experiments were interrupted for reasons discussed in chapter \ref{chap:results} (Results). The \command'if __name__ == "__main__":' block in \texttt{load\_suite.py} is set up as a script, which accepts paths to the input and output directories as command line arguments and loads these subsets.
 
 \section{Classification}
+\label{sec:classification}
 
-The classification process uses the \texttt{PyTorch Lightning} library to build and train the models. The architecture is created using \texttt{PyTorch} and the training and testing process is handled by \texttt{PyTorch Lightning}. The implemented architecture that was selected is a CNN-LSTM hybrid and is defined in the \texttt{CNN\_LSTM} class in \texttt{cnn\_lstm.py}. The training is handled in the \texttt{Runner} and \texttt{KFoldRunner} for three-way split and k-fold cross-validation respectively, both defined in \texttt{run.py}. For running a suite of experiments, created by the \texttt{LoadSuite} class, the \texttt{TrainSuite} class is provided in \texttt{train\_suite.py}.
+The classification process uses the \product{PyTorch Lightning} library to build and train the models. The architecture is created using \product{PyTorch} and the training and testing process is handled by \product{PyTorch Lightning}. The implemented architecture that was selected is a CNN-LSTM hybrid and is defined in the \texttt{CNN\_LSTM} class in \texttt{cnn\_lstm.py}. The training is handled in the \texttt{Runner} and \texttt{KFoldRunner} for three-way split and k-fold cross-validation respectively, both defined in \texttt{run.py}. For running a suite of experiments, created by the \texttt{LoadSuite} class, the \texttt{TrainSuite} class is provided in \texttt{train\_suite.py}.
 
 \subsection{Architecture}
 
@@ -414,14 +421,52 @@ After evaluating with k-fold cross-validation, another model is trained on the w
 
 \subsection{Metrics}
 
-The models' performance is evaluated using accuracy, precision, recall, F1 score and the area under the receiver operating characteristic curve (AUC-ROC). The metrics are calculated using the \texttt{torchmetrics} library, which provides a high-level interface for gathering metrics for \texttt{PyTorch} and \texttt{PyTorch Lightning} models. The metrics are aggregated only during testing.
+The models' performance is evaluated using accuracy, precision, recall, F1 score and the area under the receiver operating characteristic curve (AUC-ROC). All the metrics, except AUC-ROC, were calculated using both micro and macro averaging. The micro averaging calculates the metrics globally by counting the total true positives, true negatives, false negatives and false positives, while the macro averaging calculates the metrics for each class separately and then averages them.
+The metrics are calculated using the \product{TorchMetrics} library, which provides a high-level interface for gathering metrics for \product{PyTorch} and \product{PyTorch Lightning} models. The metrics are aggregated only during testing.
 
 % TODO: Maybe explain the metrics?
 
 \subsection{Train Suite}
 
+For running a set of experiments in succession, the \texttt{TrainSuite} class is provided in \texttt{train\_suite.py}. It is made to train models of a specific architecture on multiple datasets, structured and saved in a specific way, which matches the output of the \texttt{LoadSuite} class. \texttt{TrainSuite} is provided the path to the top directory, which contains the datasets in subdirectories, and the type of the model to be trained (the specific objects are created on the fly) on construction. Non default parameters of the model and the training process (such as the number of folds for k-fold cross-validation) can also be set in the constructor and will be passed to the model and the runner. The \texttt{TrainSuite} class implements a \texttt{run} method, which iterates over the subdirectories of the top directory. In each subdirectory, the dataset is loaded (if present, otherwise the directory is skipped) and the model is trained and evaluated using k-fold cross-validation. After that, a final model is trained on the whole dataset and saved in the subdirectory. The metrics, aggregated during cross-validation, are averaged and the means and standard deviations are saved in a \texttt{.json} file in the subdirectory. The \command'if __name__ == "__main__":' block of the \texttt{train\_suite.py} file is set up in a way, which will accept the path to the top directory as a command line argument and run the experiments with the default parameters.
+
 \chapter{Results}
 \label{chap:results}
+
+% TODO: Machine specs? The extra set?
+
+The experiments were conducted on the Stieger-62 dataset, using a CNN-LSTM network with the architecture described in section \ref{sec:classification}. 5-fold cross-validation was employed to evaluate performance, the resulting metrics, recorded below, are averaged over the folds. 4 different subsets, based on subject metadata, of the Stieger-62 dataset were used. The overview of these sets can be seen in table \ref{tab:subsets}. In the table, alias is a code name, used during experimentation for things like directory names, subjects is the number of subjects in the subset, trials is the number of trials in the subset after artifact removal, PtP refused is the percentage of trials that was refused by the peak-to-peak artifact removal method and description summarizes the metadata used to select the subset.
+
+\begin{table}
+	\label{tab:subsets}
+	\centering
+	\caption{Used subsets of the Stieger-62 dataset}
+	\begin{tabular}{*{5}{l}}
+		\toprule
+		\textbf{Alias} & \textbf{Subjects} & \textbf{Trials} & \textbf{PtP refused [\%]} & \textbf{Description} \\
+		\midrule
+		all_0-30\\
+
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Results Overview}
+
+\begin{table}
+	\label{tab:results}
+	\centering
+	\caption[Model results]{Model results}
+	\begin{tabular}{*{5}{l}}
+		\toprule
+		\textbf{Alias} & \textbf{Subjects} & \textbf{Trials} & \textbf{PtP refused [\%]} & \textbf{Description} \\
+		\midrule
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\chapter{Conclusion}
+\label{chap:conclusion}
 
 % \appendix
 % \chapter{Appendix A}

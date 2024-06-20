@@ -67,6 +67,12 @@ if __name__ == "__main__":
     if not outputs_dir.exists():
         print(f"Path {outputs_dir} does not exist.")
         exit(1)
+    if not inputs_dir.is_dir():
+        print(f"{inputs_dir} is not a directory.")
+        exit(1)
+    if not outputs_dir.is_dir():
+        print(f"{outputs_dir} is not a directory.")
+        exit(1)
 
     suite = LoadSuite(inputs_dir, outputs_dir)
 
@@ -83,49 +89,10 @@ if __name__ == "__main__":
         SubjectSpec(age_range=(50, 100)),
     )
     suite.load_and_process(
-        "rh_0-30",
-        SubjectSpec(age_range=(0, 30), handedness="R"),
-    )
-    suite.load_and_process(
-        "rh_30-50",
-        SubjectSpec(age_range=(30, 50), handedness="R"),
-    )
-    suite.load_and_process(
-        "rh_50-100",
-        SubjectSpec(age_range=(50, 100), handedness="R"),
-    )
-    suite.load_and_process(
-        "f_0-30",
-        SubjectSpec(age_range=(0, 30), gender="F"),
-    )
-    suite.load_and_process(
-        "f_30-50",
-        SubjectSpec(age_range=(30, 50), gender="F"),
-    )
-    suite.load_and_process(
-        "f_50-100",
-        SubjectSpec(age_range=(50, 100), gender="F"),
-    )
-    suite.load_and_process(
-        "meditation",
-        SubjectSpec(mbsr=True),
-    )
-    suite.load_and_process(
-        "instrument",
-        SubjectSpec(instrument=["Y"]),
-    )
-    suite.load_and_process(
         "athlete",
         SubjectSpec(athlete=["Y"]),
     )
-    suite.load_and_process(
-        "handsport",
-        SubjectSpec(handsport=["Y"]),
-    )
-    suite.load_and_process(
-        "hobby",
-        SubjectSpec(hobby=["Y"]),
-    )
+    # TODO: Maybe delete
     suite.load_and_process(
         "sub1",
         loader=Loader(subject_nums=[1]),
