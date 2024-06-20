@@ -7,13 +7,12 @@
 % TODO:
 \stagworkid{96954}
 \assignment{zadani.pdf}
-\signdate{31}{12}{2022}{V Nové Vsi u Nového Města na Moravě}
+\signdate{20}{6}{2024}{In Pilsen}
 \addbibresource{references.bib}
-\abstract{Text abstraktu v jazyce práce , tj. zde česky.}
+\abstract{The differences between human brains can cause major complications when trying to classify EEG recordings. This work aims to answer the question whether similarities between subjects, such as age and gender, can be used to train unique classifiers for each group with better performane. A large dataset of 62 subjects with available demographic information is used to train models with a custom CNN-LSTM architecture. The experiment fails, achieving accuracies close to or even below random guessing, likely caused by insufficient complexity of the used architecture.}
 {The abstract text in a secondary language, here in English.}
-\keywords{šablona kvalifikační práce ,sazba ,DTP ,\LaTeX}
+\keywords{Electroencephalography, Brain-computer interface, Motor imagery, Deep learning}
 \acknowledgement{Text poděkování.}
-% ENDTODO:
 \begin{document}
 
 \frontpages[tm]
@@ -442,38 +441,56 @@ The experiments were conducted on the Stieger-62 dataset, using a CNN-LSTM netwo
 		\textbf{Alias} & \textbf{Subjects} & \textbf{Trials} & \textbf{PtP refused [\%]} & \textbf{Description} \\
 		\midrule
 		all\_0-30 & 20 & 34892 & 48.99 & All subjects younger than 30 years\\
-		all\_30-50 & 18 & 48397 & 43.4 & All subjects of age in range 30-50\\
+		all\_30-50 & 18 & 48397 & 43.40 & All subjects of age in range 30-50\\
 		all\_50-100 & 22 & 50736 & 51.82 & All subjects of age 50 or older\\
-		athlete & 22 & 45922 & 47.4 & All subjects who consider themselves athletes\\
+		athlete & 22 & 45922 & 47.40 & All subjects who consider themselves athletes\\
 		sub1 & 1 & 4076 & 17.66 & Subject number 1\\
 		\bottomrule
 	\end{tabular}
 \end{table}
 
-\section{Results Overview}
+The results of the experiments are shown in table \ref{tab:results}. The displayed versions are macro-averaged and in percentages (except for AUC-ROC). Online acc is the accuracy achieved online, during recording of the dataset. The authors provide information about whether each trial succeeded or failed, which is used to calculate this metric.
 
 \begin{table}
 	\label{tab:results}
 	\centering
-	\caption[Model results]{Model results}
-	\begin{tabular}{*{5}{l}}
+	\caption{Model results}
+	\resizebox{\textwidth}{!}{
+	\begin{tabular}{l*{6}{c}}
 		\toprule
-		\textbf{Alias} & \textbf{Subjects} & \textbf{Trials} & \textbf{PtP refused [\%]} & \textbf{Description} \\
+		\textbf{Alias} & \textbf{Online Acc} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{AUC-ROC} \\
 		\midrule
-		all\_0-30\\
-		all\_30-50\\
-		all\_50-100\\
-		athlete\\
-		sub1\\
+		all\_0-30
+					   & 51.41 & $30.00\pm27.38$ & $15.00\pm13.69$ & $30.00\pm27.38$ & $20.00\pm18.25$ & $0.22\pm0.13$\\
+		all\_30-50
+					   & 47.81 & $21.67\pm12.64$ & $04.41\pm02.65$ & $21.67\pm12.64$ & $07.25\pm04.23$ & $0.51\pm0.10$\\
+		all\_50-100
+					   & 50.81 & $25.00\pm00.00$ & $29.48\pm11.56$ & $25.00\pm00.00$ & $11.13\pm03.55$ & $0.51\pm0.02$\\
+		athlete
+					   & 48.14 & $25.00\pm00.00$ & $07.10\pm02.65$ & $25.00\pm00.00$ & $10.84\pm03.33$ & $0.49\pm0.08$\\
+		sub1
+					   & 55.42 & $57.47\pm17.33$ & $57.90\pm20.70$ & $57.47\pm17.33$ & $54.60\pm19.89$ & $0.81\pm0.11$\\
 		\bottomrule
 	\end{tabular}
+}
 \end{table}
 
 \section{Results Discussion}
 \label{sec:disc}
 
+It is clear from the results that the models are not able to capture the required information from the intra-subject data. The metrics are very low, usually near or even below random guessing (which would be accuracy of 25\% in this case). This is the reason the experiments were interrupted after the initial 4, in order to perform more "metaexperimentation" and possibly find an error in the model architecture. None was found, instead it was discovered that the model still seems to perform decently for within-subject classification. For this reason, the additional experiment was conducted, to provide comparison and indeed the results are much better, though still nowhere near state-of-the-art.
+
+The reason for this is likely insufficient complexity of the architecture. It appears that the models are not able to generalize over the differences between subjects. Alternatively, it is possible, that there was not enough similarities between subjects within the datasets.
+
 \chapter{Conclusion}
-\label{chap:conclusion}
+
+In this work, a unique experiment was designed, which aimed to test whether there are similarities between EEG-recorded brain activity of individuals with similar demographic traits, such as gender, age and motor skills, which a deep learning classifier could capture and use to its advantage. This would be an alternative to the two traditional approaches: intra-subject classification, which tends to suffer lack of available data, and inter-subject classification, which suffers from the differences between subjects.
+
+The experiment was conducted on (and inspired by) the Stieger-62 dataset~\cite{data:stieger:21}, a massive dataset, equipped with thorough metadata. For classifiaction, a custom (though inspired by EEGNet~\cite{lawhern:eegnet:18}) CNN-LSTM hybrid architecture was designed. A tool for loading and preprocessing subsets of Stieger-62 dataset based on metadata was created, as well as a tool for training and testing models on the output of the loading tool.
+
+The experiments, however, did not provide the expected results. The models were completely unable to capture information from cross-subject data, likely due to insufficient complexity of the architecture. For intra-subject classification, the architecture seems to perform decently, but still far from state-of-the-art. In addition, this was not the main goal of the experiment.
+
+For these reasons, whether the similarities between subjects can be used to train better classifiers, remains unanswered. In the author's opinion, it is still a question worth answering, as the potential benefits are great. For future research, it is recommended to use a more complex architecture, which was already proved performant in intra-subject EEG classification. The Stieger-62 dataset still seems like a great choice for this and the tools created as a part of this work could be built upon and used for further research.
 
 % \appendix
 % \chapter{Appendix A}
