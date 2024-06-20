@@ -126,3 +126,7 @@ if __name__ == "__main__":
         "hobby",
         SubjectSpec(hobby=["Y"]),
     )
+    suite.load_and_process(
+        "sub1",
+        loader=Loader(subject_nums=[1]),
+    )
