@@ -42,7 +42,7 @@ Electroencephalography (EEG) is possibly the most frequently used method of reco
 
 The electrodes are usually placed according to the international 10-20 system, or alternatively with the newer 10-10 system. The numbers represent the percentage of the size of the skull, which is used to determine the space between the electrodes. In the 10-20 system it is 10\% and 20\% of the left-to-right and front-to-back direction, in the 10-10 system it is 10\% in both directions, resulting in more electrode placement options~\cite{acharya:channels:16}. The electrodes are marked with letters and numbers. The letters are as follows: A for ear lobe, T for temporal, F  for frontal, C for central, P for parietal and O for occipital. In the 10-10 system, letters can also come in pairs, denoting electrodes placed between two neighbouring areas. The numbers are odd for the left hemisphere and even for the right hemisphere, increasing with distance from the centre, which is marked with a 'z' instead.
 
-\begin{figure}[h]
+\begin{figure}
 	\label{fig:channels}
 	\includegraphics[width=\textwidth]{fig/channels.png}
 	\caption[The 10-10 system of electrode placement]{The 10-10 system of electrode placement. Source: \href{https://commons.wikimedia.org/wiki/File:EEG_10-10_system_with_additional_information.svg}{\textit{Wikimedia Commons}}}
@@ -78,7 +78,7 @@ The BCI then attempts to discern the imagined motion and passes the information 
 
 An interesting property of motor imagery is that it tends to have a similar effect on the brain as actually performing the movement~\cite{pfurtscheller:mi:01}. An important type of brain oscillation is the mu rhythm, also called the sensorimotor rhythm (SMR). It originates in the sensorimotor cortex and has frequencies in the range of 6-13 Hz. Its amplitude can become greatly suppressed in response to an internal or external event, such as sensory input, movement or mental imagery. This is often referred to as event-related desynchronization (ERD) and the usually following amplitude enhancement is called event-related synchronization (ERS). In SMR, ERD occurs with planning and initiating the execution of a movement and shortly after, ERS begins, returning to the original level within a few seconds. These activities seem to be present in the primary sensorimotor cortex with motor imagery similarly to actual motion performance, even though to a lesser extent~\cite{pfurtscheller:mi:01}. They can be most prominently measured on the C3, Cz and C4 electrodes, which are placed over the primary sensorimotor cortex, but also in the neighbouring ones, which you can see in figure \ref{fig:channels}.
 
-\begin{figure}[h]
+\begin{figure}
 	\includegraphics[width=\textwidth]{fig/erders.png}
 	\caption[EEG signal with visible ERD and ERS]{Ongoing EEG with right finger movement, $t=0s$ marks the start of movement. Note ERD prior to movement onset and ERS during movement \textcopyright 2001 IEEE,~\cite{pfurtscheller:mi:01}}
 \end{figure}
@@ -114,14 +114,14 @@ The main components of Convolutional Neural Networks (CNNs) are convolutional la
 
 The convolutional layer is the core of CNNs. It applies small-sized filters, also called kernels to the input, convolving across it. That essentially means it slides through the input and computes scalar dot products between the kernel and each position in the input. The weights in the kernels, called activations, are what is actually learned by the model during training~\cite{oshea:cnn:15}. In a typical image classification task, such as the MNIST database of written digits, these can for example pick up on curves of the digits. Similarly, they are able to learn to recognize patterns in EEG data, such as the mu rhythm, or the event-related desynchronization and synchronization.
 
-\begin{figure}[h]
+\begin{figure}
 	\includegraphics[width=\textwidth]{fig/conv.png}
 	\caption[Convolution operation]{Convolution operation with a kernel of size 3x3 and step of 1. Step denotes by how many spaces the filter is moved every iteration. Source: \href{https://commons.wikimedia.org/wiki/File:CNN-filter-animation-1.gif}{\textit{Wikimedia Commons}}}
 \end{figure}
 
 Pooling layers aim to further reduce the dimensionality by applying a function over a kernel-sized window of the input. The most common pooling function is max pooling, which outputs the maximum value in the window, but average pooling is common as well. While this operation generally preserves the most important information, it is still destructive in nature. For this reason, a kernel of size 2x2 is usually used. With a step of 2 (moving the kernel two spaces at a time) this results in a 75\% reduction of the input~\cite{oshea:cnn:15}.
 
-\begin{figure}[ht]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{fig/maxpool.png}
 	\caption[Max pooling operation]{Max pooling operation with a kernel of size 2x2 and step of 2. Source: \href{https://commons.wikimedia.org/wiki/File:Max_pooling.png}{\textit{Wikimedia Commons}}}
@@ -135,7 +135,7 @@ Recurrent Neural Networks (RNNs) are a type of neural network designed to proces
 
 Long Short-Term Memory network is a type of RNN, designed to overcome this issue. It has a more complex structure, with a cell state, modifiable by gates, which are essentially neural networks themselves. The forget gate decides what information to forget (remove from the cell state), the input gate decides what information to add and with what weights, and the output gate decides what information to output. This structure allows the LSTM to remember information for a longer time, making it suitable for tasks with long-term dependencies~\cite{olah:lstm:15}.
 
-\begin{figure}[ht]
+\begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{fig/lstm.png}
 	\caption[LSTM unit]{LSTM unit. $F_t$ marks the forget gate, $I_t$ is the input gate and $O_t$ the output gate. $C$ symbolizes the cell state, $h$ the hidden state, $X$ marks the input, which gets concatenated with $h$ and $O$ marks the output, which is actually just a copy of $h$. Source: \href{https://commons.wikimedia.org/wiki/File:Long_Short-Term_Memory.svg}{\textit{Wikimedia Commons}}}
@@ -359,10 +359,69 @@ The method creates a subdirectory in the output directory, named with the experi
 	)
 \end{code}
 
+In the conducted experiment, the following subsets were used: All subjects, younger than 30 years of age, between 30 and 50 years of age, older than 50 years of age and those, who considered themselves athletes. The use of more subsets was planned, but then the experiments were interupted for reasons discussed in chapter \ref{chap:results} (Results).
+
 \section{Classification}
 
+The classification process uses the \texttt{PyTorch Lightning} library to build and train the models. The architecture is created using \texttt{PyTorch} and the training and testing process is handled by \texttt{PyTorch Lightning}. The implemented architecture that was selected is a CNN-LSTM hybrid and is defined in the \texttt{CNN\_LSTM} class in \texttt{cnn\_lstm.py}. The training is handled in the \texttt{Runner} and \texttt{KFoldRunner} for three-way split and k-fold cross-validation respectively, both defined in \texttt{run.py}. For running a suite of experiments, created by the \texttt{LoadSuite} class, the \texttt{TrainSuite} class is provided in \texttt{train\_suite.py}.
 
+\subsection{Architecture}
 
+The CNN-LSTM hybrid architecture was chosen for its ability to capture both spatial and temporal information. For the CNN part, a modified version of the renowned EEGNet~\cite{lawhern:eegnet:18} architecture was used. The original EEGNet was designed for two-dimensional time-frequency transforms of EEG data and as such uses 2D convolutions. In our case, using the time series representation, 1D convolutional layers are used instead. Otherwise, the structure and hyperparameters are very similar, except before the fully connected output layer, 3 layers of LSTM were inserted. During "metaexperimentation", many adjustments were attempted, but none outperformed the presented version, which achieved accuracies of around 60\% on small subsets of the dataset.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{fig/arch}
+	\caption{The implemented CNN-LSTM hybrid architecture}
+	\label{fig:arch}
+\end{figure}
+
+The full architecture can be seen in figure \ref{fig:arch}, the shortcuts and parameters are as follows:
+
+\begin{itemize}
+	\item\texttt{Conv(kernel size, filters)} is a standard full convolutional layer,
+	\item\texttt{BatchNorm} is a batch normalization layer,
+	\item\texttt{DWConv(kernel size, filters, depth)} is a depthwise convolutional layer,
+	\item\texttt{ReLU} is a ReLU activation function,
+	\item\texttt{AvgPool(kernel size)} is an average pooling layer,
+	\item\texttt{Dropout(dropout rate)} is a dropout layer,
+	\item\texttt{SepConv(kernel size)} is a separable convolutional layer,
+	\item\texttt{LSTM(hidden size)} is an LSTM layer,
+	\item\texttt{FC} is a fully connected output layer.
+\end{itemize}
+
+With convolutional layers, padding is always set to "same" and stride is equal to 1, which also applies to the pooling layers. Padding determines the behaviour on the edges of the input and stride determines by how much the kernel is moved after each application.
+
+In the firs convolutional block, depthwise convolution is used as the second convolutional layer (after the full convolutional layer). Its main benefit is the reduced amount of trained parameters, which is gained by applying different filters to each input channel separately, instead of applying each filter over the entire input. The amount of filters applied to each channel is called \term{depth} and in our case set to 2.
+
+In the second convolutional bloc, separable convolution is used. This is essentially a depthwise convolution (in this case with kernel size of 16, 16 filters and depth of 1), followed by a pointwise convolution. Pointwise convolution is essentially just a convolution with a kernel size of 1 (and 16 filters in this case), which is used to combine the results of the depthwise convolution. The main benefit of this approach is the ability to capture more complex patterns, without increasing the amount of trained parameters too much.
+
+After each convolutional layer, a batch normalization layer is used, which applies normalization within the current batch, with the goal of speeding up the training convergence. At the end of both convolutional blocks, another batch normalization is used, followed by the ReLU activation function, a pooling layer which uses average pooling and a dropout layer. The dropout layer is used to prevent overfitting by randomly omitting a fraction of activations during training.
+
+In the final block, LSTM layers are used to help the model capture temporal information. Three of these layers are used, each with 128 hidden units. Dropout is not used here, as it seemed to decrease the models' performance. Finally a fully connected layer is used to output the class prediction scores.
+
+\subsection{Training}
+
+For loss function, the multiclass cross-entropy loss is used, as it is a standard choice for classification tasks. The loss function is also monitored during validation, which is used for early stopping and learning rate reduction.
+
+For optimization, the Adam optimizer is used. It is a popular choice for deep learning tasks, as it is known for its good performance and ease of use. The learning rate is initially set to $10^{-2}$ and is reduced by a factor of 0.1 if the validation loss does not improve for 5 epochs. This is defined in the \texttt{build\_adam\_RLROP} function in \texttt{optim.py}.
+
+During training, the k-fold cross-validation method is used to evaluate the models' performance. This technique splits the dataset into k equally sized parts, trains the model on k-1 parts and tests it on the remaining part. This process is repeated k times, each time with a different part used for testing. The average of the resulting metrics, along with their standard deviation, then provides a more reliable estimate of the models' performance.
+
+In our experiments, k is set to 5. Each fold is trained for up to 100 epochs, utilizing early stopping with patience of 20, meaning that if the validation loss does not improve for 20 epochs, the training is stopped. This is done to prevent overfitting and reduce the training time.
+
+After evaluating with k-fold cross-validation, another model is trained on the whole dataset, using the same parameters, except the training loss is monitored for the purpose of early stopping and learning rate reduction. This is necessary, as there is no data left for validation. This final model is then saved for potential future use, using \texttt{Lightning}'s \texttt{Trainer.save\_checkpoint} method.
+
+\subsection{Metrics}
+
+The models' performance is evaluated using accuracy, precision, recall, F1 score and the area under the receiver operating characteristic curve (AUC-ROC). The metrics are calculated using the \texttt{torchmetrics} library, which provides a high-level interface for gathering metrics for \texttt{PyTorch} and \texttt{PyTorch Lightning} models. The metrics are aggregated only during testing.
+
+% TODO: Maybe explain the metrics?
+
+\subsection{Train Suite}
+
+\chapter{Results}
+\label{chap:results}
 
 % \appendix
 % \chapter{Appendix A}

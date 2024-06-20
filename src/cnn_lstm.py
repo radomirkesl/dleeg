@@ -21,7 +21,7 @@ class CNN_LSTM(L.LightningModule):
         feature_count=4,
         conv_depth=2,
         dropout_rate=0.5,
-        hidden_size=128,
+        lstm_hidden_size=128,
         lstm_layers=3,
         rlrop_use_train_loss=False,
     ):
@@ -70,12 +70,12 @@ class CNN_LSTM(L.LightningModule):
         )
         self.lstm = nn.LSTM(
             input_size=conv2_filters,
-            hidden_size=hidden_size,
+            hidden_size=lstm_hidden_size,
             batch_first=True,
             num_layers=lstm_layers,
         )
         self.full = nn.Linear(
-            in_features=hidden_size,
+            in_features=lstm_hidden_size,
             out_features=feature_count,
         )
         self.train_loss = nn.CrossEntropyLoss()

@@ -44,7 +44,7 @@ class TrainSuite:
                 continue
             if not self.overwrite and results_path.exists():
                 print(
-                    f"Skipping {experiment_name} as {results_path.name} exists, to retrain use CLSuite(overwrite=True)"
+                    f"Skipping {experiment_name} as {results_path.name} exists, to retrain use TrainSuite(overwrite=True)"
                 )
                 continue
             print("----------------------------------------")
