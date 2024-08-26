@@ -1,0 +1,170 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[IL2]{fontenc}
+\usepackage[czech]{babel}
+
+\usetheme{Madrid}
+\usecolortheme{seahorse}
+\usepackage{tikz}
+\usepackage{booktabs}
+
+\title{Neuronové sítě pro zpracování záznamů elektrické aktivity mozku}
+\author[Radomír Kesl]{
+	Radomír Kesl\\
+	% \texttt{A19B0088P}\\
+	% \texttt{keslra@students.zcu.cz}
+	\and
+	\footnotesize{Vedoucí práce: doc. Ing. Roman Mouček, Ph.D.}
+}
+\institute[KIV FAV ZČU]{
+Katedra informatiky a výpočetní techniky\\
+Fakulta aplikovaných věd\\
+Západočeská univerzita v Plzni
+}
+\date{27. srpna 2024}
+\logo{\includegraphics[width=0.3\linewidth]{images/fav.pdf}}
+
+\begin{document}
+
+\frame{\titlepage}
+% \tableofcontents
+
+\begin{frame}
+	\frametitle{Úvod --- Cíle práce}
+	\begin{itemize}
+		\item Najít vhodnou mezeru ve výzkumu neuronových sítí pro zpracování záznamů elektrické aktivity mozku a prozkoumat ji
+		\item Vliv společných vlastností subjektů na kvalitu klasifikátoru
+		\item Věková skupina, lateralita, pohlaví, manuální zručnost
+		\item Možné zvýšení přesnosti oproti mezisubjektovému přístupu
+		\item Lepší praktická využitelnost než přístup s jedním subjektem
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Zvolený dataset}
+	\begin{itemize}
+		\item Continuous sensorimotor rhythm based brain computer interface learning in a large population
+		\item BCI ovládání kurzoru představou pohybu rukou
+		\item 62 účastníků, 250 000 záznamů, 600 hodin
+		\item Dobře vybavený metadaty
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Použitá architektura}
+	\begin{itemize}
+		% \item Dva programy
+		%       \begin{itemize}
+		% 	      \item Načtení dat, volba subjektů, předzpracování, uložení
+		% 	      \item Trénování a testování modelů
+		%       \end{itemize}
+		\item Architektura CNN-LSTM
+		      \begin{itemize}
+			      \item CNN založená na EEGNet
+			      \item Reprezentace časovou řadou $\rightarrow$ 1D
+			      \item 3 vrstvy LSTM
+		      \end{itemize}
+		      % \item<3-> Trénování a testování
+		      %       \begin{itemize}
+		      % 	      \item Křížová entropie
+		      % 	      \item Optimalizátor Adam, snižování konstanty učení
+		      % 	      \item Křížová validace, 5-fold
+		      % 	      \item 100 epoch, zastavení po 20 bez zlepšení ztrátové funkce
+		      %       \end{itemize}
+	\end{itemize}
+	\begin{figure}
+		\onslide<2>
+		\centering
+		\begin{tikzpicture}[remember picture, overlay]
+			\fill [white] (current page.center) ++(-0.42\textwidth,-0.45\textheight) rectangle ++(0.85\textwidth,0.85\textheight);
+			\node at (current page.center) {\includegraphics[width=0.8\textwidth]{images/arch.pdf}};
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+
+	% \begin{table}
+	% 	\centering
+	% 	% \caption{Used subsets of the Stieger-62 dataset}
+	% 	\begin{tabular}{*{4}{l}p{0.25\textwidth}}
+	% 		\toprule
+	% 		\textbf{Alias} & \textbf{Subjects} & \textbf{Trials} & \textbf{PtP refused [\%]} & \textbf{Description}                          \\
+	% 		\midrule
+	% 		all\_0-30      & 20                & 34892           & 48.99                     & All subjects younger than 30 years            \\
+	% 		all\_30-50     & 18                & 48397           & 43.40                     & All subjects of age in range 30-50            \\
+	% 		all\_50-100    & 22                & 50736           & 51.82                     & All subjects of age 50 or older               \\
+	% 		athlete        & 22                & 45922           & 47.40                     & All subjects who consider themselves athletes \\
+	% 		sub1           & 1                 & 4076            & 17.66                     & Subject number 1                              \\
+	% 		\bottomrule
+	% 	\end{tabular}
+	% \end{table}
+	% \end{frame}
+	% \begin{frame}
+	\frametitle{Výsledky}
+	\begin{table}
+		\centering
+		% \caption{Model results}
+		\resizebox{\textwidth}{!}{
+			\begin{tabular}{l*{6}{c}}
+				\toprule
+				\textbf{Alias} & \textbf{Online Acc} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{AUC-ROC} \\
+				\midrule
+				all\_0-30
+				               & 51.41               & $30.00\pm27.38$   & $15.00\pm13.69$    & $30.00\pm27.38$ & $20.00\pm18.25$   & $0.22\pm0.13$    \\
+				all\_30-50
+				               & 47.81               & $21.67\pm12.64$   & $04.41\pm02.65$    & $21.67\pm12.64$ & $07.25\pm04.23$   & $0.51\pm0.10$    \\
+				all\_50-100
+				               & 50.81               & $25.00\pm00.00$   & $29.48\pm11.56$    & $25.00\pm00.00$ & $11.13\pm03.55$   & $0.51\pm0.02$    \\
+				athlete
+				               & 48.14               & $25.00\pm00.00$   & $07.10\pm02.65$    & $25.00\pm00.00$ & $10.84\pm03.33$   & $0.49\pm0.08$    \\
+				sub1
+				               & 55.42               & $57.47\pm17.33$   & $57.90\pm20.70$    & $57.47\pm17.33$ & $54.60\pm19.89$   & $0.81\pm0.11$    \\
+				\bottomrule
+			\end{tabular}
+		}
+	\end{table}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Závěr}
+	\begin{itemize}
+		\item Výsledky klasifikace v podstatě náhodné
+		\item Zřejmě špatná schopnost generalizace modelu pro více subjektů
+		\item Výsledky nepodporují hypotézu (ale ani jí neodporují)
+		\item Problematikou má smysl se dále zabývat
+		      \begin{itemize}
+			      \item Osvědčené architektury
+			      \item Architektury pro více subjektů
+			      \item Architektury pro jeden subjekt
+		      \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\centering
+	\huge
+	\texttt{keslra@students.zcu.cz}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Otázky}
+	\begin{enumerate}
+		\item Proč byla zvolena architektura CNN-LSTM? Prosím objasněte.
+		      \begin{itemize}
+			      \item Na doporučení vedoucího
+			      \item Příklady úspěšného použití v literatuře
+			      \item CNN --- prostorové závislosti, LSTM --- časové
+		      \end{itemize}
+		\item Proč jste zvolil tyto hyperparametry a metody předzpracování? Je nějaký specifický důvod nebo jsou založeny jen na přístupu pokus-omyl? Prosím objasněte.
+		      \begin{itemize}
+			      \item Inspirace --- EEGNet a práce Ing. Jakuba Kodery
+			      \item Pokus-omyl
+		      \end{itemize}
+	\end{enumerate}
+
+\end{frame}
+
+\end{document}
